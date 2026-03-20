@@ -36,6 +36,9 @@ jobs:
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
 
+      - name: Restore .NET workloads
+        run: dotnet workload restore src/ErrorAnalyzer.WASM/ErrorAnalyzer.WASM.csproj
+
       - name: Build GitHub Pages site
         run: bun run build:pages s1-error-analyzer
 
