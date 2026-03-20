@@ -11,6 +11,7 @@ src/scheduleone-error-analyzer/dist-ssr/
 # Logs and local files
 *.log
 *.local
+ScheduleOneErrorAnalyzerPlan.md
 
 # Editor files
 .idea/
