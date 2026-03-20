@@ -1,0 +1,43 @@
+{
+  "mainAssemblyName": "ErrorAnalyzer.WASM.dll",
+  "resources": {
+    "hash": "sha256-mo4JxuNivHMjWZ6uH0un35mBKR6oxft6fX087GWfuP8=",
+    "jsModuleNative": {
+      "dotnet.native.js": "sha256-wC/E+zgo7TJqHZmFYsirUK4pYZ5Ib6WfJuyiOMz05eE="
+    },
+    "jsModuleRuntime": {
+      "dotnet.runtime.js": "sha256-sRdYoaUiZmrqOtPGSBpgxZxxSQsILEw5kzx7dL4zlfw="
+    },
+    "wasmNative": {
+      "dotnet.native.wasm": "sha256-kEs8dizMrBt+Idl1pGyMc/wXls1lWbRC6PV7Qyls9Xs="
+    },
+    "wasmSymbols": {
+      "dotnet.native.js.symbols": "sha256-1BpbbwiVRYqWqmJ4aS8C3x/uM+eW2bmId3MWvlkud+I="
+    },
+    "icu": {
+      "icudt_CJK.dat": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk=",
+      "icudt_EFIGS.dat": "sha256-8fItetYY8kQ0ww6oxwTLiT3oXlBwHKumbeP2pRF4yTc=",
+      "icudt_no_CJK.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
+    },
+    "assembly": {
+      "ErrorAnalyzer.Core.wasm": "sha256-9vMMhHBq1keYnHY6pDmEupEqU7zI1bsm2hAUZvrthhY=",
+      "ErrorAnalyzer.WASM.wasm": "sha256-SFjkTCorP8LFC9Nm00591XATOAEPod0MuAr+1tYiwog=",
+      "System.Collections.Concurrent.wasm": "sha256-5X3De2dbKUxGGLd2wjUS0gpxCY0WMfJBNHxuJB9zDyY=",
+      "System.Collections.wasm": "sha256-Zmxagt3Gl0Wi3dF4YvLyNBusCsyu2nQNVVUJfQeON28=",
+      "System.Linq.wasm": "sha256-o89EOvsbgJXrAgyJO+vIQJeYk575BHI4dXhBF+fZEOY=",
+      "System.Memory.wasm": "sha256-0bJMF5PmsUq1KAOS20R1F2QM14ZR6z0itQZruOt4XhE=",
+      "System.Private.CoreLib.wasm": "sha256-rsDZvBXWvXc36wJYlEHnwI9GIx5j1WLGyEeXOg0qa5Q=",
+      "System.Runtime.InteropServices.JavaScript.wasm": "sha256-8MMaMmP65tR/DfuIJdPlsNuq32hFQpSYcQnEGBHNJSs=",
+      "System.Text.Encodings.Web.wasm": "sha256-13bUdEJJUPa4q3UL/QiX4DEfpJUUNWbco7gshppCh6c=",
+      "System.Text.Json.wasm": "sha256-GgzG4kccb8Nz9/z5AZpV5oRg7ozKeK9CIl2hzj37C5I=",
+      "System.Text.RegularExpressions.wasm": "sha256-A7fTHGjM9bJzIepRgPY4gxuC8UVpcHaWcZJSoplCjmA="
+    },
+    "vfs": {
+      "runtimeconfig.bin": {
+        "supportFiles/0_runtimeconfig.bin": "sha256-RXdkKJ/zp3/wghk6zKM5FbM0iNSXbIj2DNc0iM+deWU="
+      }
+    }
+  },
+  "debugLevel": 0,
+  "globalizationMode": "sharded"
+}

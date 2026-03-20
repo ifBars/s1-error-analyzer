@@ -1,0 +1,231 @@
+.app-shell {
+  display: grid;
+  gap: 28px;
+  padding: 28px 24px 40px;
+}
+
+.page-header {
+  display: grid;
+  gap: 8px;
+}
+
+.eyebrow,
+.section-step,
+.label,
+.action-kicker {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.section-block {
+  display: grid;
+  gap: 18px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-h);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dropzone {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 180px;
+  border: 1px dashed var(--accent);
+  border-radius: 18px;
+  padding: 24px;
+  background: rgba(39, 123, 160, 0.04);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dropzone input {
+  display: none;
+}
+
+.dropzone-busy {
+  opacity: 0.75;
+}
+
+.dropzone-title {
+  font-family: var(--heading);
+  color: var(--text-h);
+  font-size: 1.5rem;
+}
+
+.dropzone-text,
+.action-secondary,
+.detail-meta,
+.subtle-text {
+  color: var(--text-soft);
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.status-row > div {
+  display: grid;
+  gap: 6px;
+}
+
+.status-row strong,
+.notice-text strong,
+.action-primary,
+.detail-action {
+  color: var(--text-h);
+}
+
+.progress-line {
+  height: 6px;
+  background: rgba(39, 123, 160, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-line span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 120ms linear;
+}
+
+.notice-text {
+  display: grid;
+  gap: 6px;
+  max-width: 56rem;
+}
+
+.notice-error {
+  color: var(--warning);
+}
+
+.action-groups {
+  display: grid;
+  gap: 20px;
+}
+
+.action-group {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.action-group-head {
+  display: grid;
+  gap: 4px;
+}
+
+.mod-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.mod-name {
+  color: var(--text-h);
+  background: rgba(39, 123, 160, 0.06);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.92rem;
+}
+
+.details-list {
+  display: grid;
+  gap: 14px;
+}
+
+.detail-item {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.detail-item summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  color: var(--text-h);
+  font-weight: 600;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.detail-item summary:focus-visible {
+  outline: 2px solid rgba(42, 128, 168, 0.28);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+.detail-body {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.detail-evidence-block {
+  display: grid;
+  gap: 6px;
+}
+
+.detail-extra-count {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+.evidence {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 18px 16px 32px;
+  }
+
+  .section-head,
+  .detail-item summary {
+    flex-direction: column;
+  }
+
+  .status-row {
+    grid-template-columns: 1fr;
+  }
+}

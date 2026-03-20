@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #eef7fb;
+  --text: #315463;
+  --text-h: #153948;
+  --text-soft: #5f7d89;
+  --border: rgba(21, 57, 72, 0.12);
+  --border-strong: rgba(21, 57, 72, 0.22);
+  --accent: #2a80a8;
+  --accent-2: #6bb89c;
+  --warning: #a85d42;
+  --code-bg: rgba(21, 57, 72, 0.06);
+
+  --sans: 'Outfit', 'Segoe UI', sans-serif;
+  --heading: 'Outfit', 'Segoe UI', sans-serif;
+  --mono: 'Space Mono', monospace;
+
+  font: 17px/1.55 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top left, rgba(42, 128, 168, 0.08), transparent 24%),
+    radial-gradient(circle at top right, rgba(107, 184, 156, 0.09), transparent 22%),
+    #eef7fb;
+}
+
+#root {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  min-height: 100svh;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--text-h);
+  font-family: var(--heading);
+  font-weight: 700;
+}
+
+h1 {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 1.02;
+}
+
+h2 {
+  font-size: 1.55rem;
+}
+
+h3 {
+  font-size: 1.18rem;
+}
+
+button,
+code {
+  font-family: var(--mono);
+}
+
+code {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: var(--code-bg);
+  color: var(--text-h);
+  font-size: 0.84rem;
+}
+
+::selection {
+  background: rgba(42, 128, 168, 0.2);
+}
