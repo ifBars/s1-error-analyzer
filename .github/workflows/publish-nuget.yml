@@ -1,0 +1,99 @@
+name: Publish NuGet Package
+
+on:
+  push:
+    branches:
+      - 'release/**'
+      - 'releases/**'
+    paths:
+      - 'src/ErrorAnalyzer.Core/ErrorAnalyzer.Core.csproj'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish-core:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        if: steps.version.outputs.changed == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Detect version bump
+        id: version
+        shell: bash
+        run: |
+          NEW_VERSION=$(grep -oPm1 '(?<=<Version>)[^<]+' src/ErrorAnalyzer.Core/ErrorAnalyzer.Core.csproj)
+
+          if [[ -z "$NEW_VERSION" ]]; then
+            echo "Unable to read current package version"
+            exit 1
+          fi
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+            echo "Publishing version $NEW_VERSION from manual dispatch"
+            exit 0
+          fi
+
+          OLD_VERSION=$(git show "${{ github.event.before }}:src/ErrorAnalyzer.Core/ErrorAnalyzer.Core.csproj" 2>/dev/null | grep -oPm1 '(?<=<Version>)[^<]+' || true)
+
+          if [[ "$OLD_VERSION" == "$NEW_VERSION" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+            echo "Version unchanged at $NEW_VERSION; skipping publish"
+            exit 0
+          fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "old_version=$OLD_VERSION" >> "$GITHUB_OUTPUT"
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version bump detected: ${OLD_VERSION:-none} -> $NEW_VERSION"
+
+      - name: Restore dependencies
+        if: steps.version.outputs.changed == 'true'
+        run: dotnet restore tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj
+
+      - name: Run core tests
+        if: steps.version.outputs.changed == 'true'
+        run: dotnet test tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj --configuration Release --no-restore
+
+      - name: Pack ErrorAnalyzer.Core
+        if: steps.version.outputs.changed == 'true'
+        run: dotnet pack src/ErrorAnalyzer.Core/ErrorAnalyzer.Core.csproj --configuration Release --no-restore -o artifacts/nuget -p:ContinuousIntegrationBuild=true
+
+      - name: Publish package to NuGet
+        if: steps.version.outputs.changed == 'true'
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          shopt -s nullglob
+          PACKAGES=(artifacts/nuget/*.nupkg)
+
+          if [[ ${#PACKAGES[@]} -eq 0 ]]; then
+            echo "No NuGet packages were produced"
+            exit 1
+          fi
+
+          for PACKAGE in "${PACKAGES[@]}"; do
+            if [[ "$PACKAGE" == *.snupkg ]]; then
+              continue
+            fi
+
+            echo "Publishing $PACKAGE"
+            dotnet nuget push "$PACKAGE" \
+              --api-key "$NUGET_API_KEY" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          done

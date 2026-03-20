@@ -4,5 +4,23 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>ScheduleOne.ErrorAnalyzer.Core</PackageId>
+    <Version>0.1.0</Version>
+    <Title>Schedule One Error Analyzer Core</Title>
+    <Description>Shared rule-based log analyzer for Schedule One mod and support tooling.</Description>
+    <Authors>OpenCode</Authors>
+    <RepositoryUrl>https://github.com/ifBars/s1-error-analyzer</RepositoryUrl>
+    <PackageTags>scheduleone;error-analyzer;logs;modding;discord</PackageTags>
+    <PackageProjectUrl>https://github.com/ifBars/s1-error-analyzer</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="" Link="README.md" />
+  </ItemGroup>
 </Project>
