@@ -1,61 +1,35 @@
-# Schedule 1 Error Analyzer Web UI
+# Schedule One Error Analyzer
 
-This is the Vite + React frontend for the browser-hosted Schedule 1 error analyzer.
+This repository is the project workspace for the Schedule One error analyzer.
 
-## Local development
+## Layout
+
+- `src/ErrorAnalyzer.Core`: shared analyzer logic
+- `src/ErrorAnalyzer.WASM`: browser-targeted .NET WASM build
+- `src/ErrorAnalyzer.Plugin`: plugin project
+- `src/scheduleone-error-analyzer`: React frontend
+- `tests/ErrorAnalyzer.Core.Tests`: .NET tests
+
+## Workspace commands
+
+Install frontend dependencies from the repository root:
 
 ```bash
 bun install
-bun run dev
 ```
 
-`predev` publishes the WASM project and syncs `_framework/` assets into `public/` before Vite starts.
-
-## Production build
+Common commands:
 
 ```bash
+bun run dev
 bun run build
+bun run build:pages s1-error-analyzer
+bun run lint
+dotnet test
 ```
 
-This also republishes the WASM analyzer first and copies the runtime assets into `public/`.
+`bun run dev` and `bun run build` delegate into the React app package and still publish/sync the WASM assets before the frontend build runs.
 
 ## GitHub Pages
 
-The app is ready to build for either:
-
-- a user/org site at `/`
-- a project site at `/<repo-name>/`
-
-### Project site build
-
-If your repository will be published at `https://<user>.github.io/ErrorAnalyzer/`, run:
-
-```bash
-bun run build:pages ErrorAnalyzer
-```
-
-That script:
-
-- republishes the WASM analyzer
-- syncs `_framework/` assets into `public/`
-- builds Vite with `base=/ErrorAnalyzer/`
-
-### User/org site build
-
-If you are deploying to the root GitHub Pages domain, run:
-
-```bash
-bun run build:pages
-```
-
-## Publish checklist
-
-- confirm the repository path you want to host under
-- build with `bun run build:pages <repo-name>` for a project site, or `bun run build:pages` for root
-- upload or deploy the generated `dist/` directory
-- in GitHub Pages settings, point deployment to the built static site
-
-## Notes
-
-- The frontend uses `import.meta.env.BASE_URL` when loading the .NET `_framework/` files, so the WASM runtime and static assets follow the GitHub Pages subpath correctly.
-- `scripts/build-pages.mjs` also accepts `GITHUB_PAGES_REPO` if you prefer setting the repo name from CI instead of passing it as a CLI argument.
+The GitHub Pages workflow lives at `.github/workflows/deploy-pages.yml` and builds the frontend from the workspace root before uploading `src/scheduleone-error-analyzer/dist`.

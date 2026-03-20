@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Configurations>Mono;IL2CPP</Configurations>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>ErrorAnalyzer</AssemblyName>
+    <RootNamespace>ErrorAnalyzer.Plugin</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ErrorAnalyzer.Core\ErrorAnalyzer.Core.csproj" />
+    <PackageReference Include="LavaGang.MelonLoader" Version="0.7.1" />
+  </ItemGroup>
+</Project>
