@@ -53,6 +53,29 @@ public sealed class LogAnalyzerTests
     }
 
     [Fact]
+    public void DetectsModInstalledInPluginsFolder()
+    {
+        var result = Analyze("25-8-16_20-40-8.log");
+
+        Assert.Contains(result.Diagnoses, x =>
+            x.RuleId == RuleIds.ModInWrongFolder &&
+            string.Equals(x.ModName, "S1API", StringComparison.Ordinal) &&
+            x.Evidence.Contains("cannot be loaded as a Plugin", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void DetectsDeclaredMissingDependenciesFromStartupWarnings()
+    {
+        var result = Analyze("26-3-14_15-46-46.log");
+
+        Assert.Contains(result.Diagnoses, x =>
+            x.RuleId == RuleIds.MissingDependency &&
+            string.Equals(x.ModName, "ChangeMixerThrehold", StringComparison.Ordinal) &&
+            x.Evidence.Contains("ModManager&PhoneApp", StringComparison.Ordinal) &&
+            x.SuggestedAction.Contains("Reinstall the mod and its required dependencies", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void DetectsDualRuntimeInstallFromLoadedAssemblies()
     {
         var lines = File.ReadAllLines(Path.Combine(FindErrorLogsDirectory(), "Latest (22).log"));

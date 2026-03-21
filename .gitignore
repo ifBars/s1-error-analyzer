@@ -10,6 +10,7 @@ src/scheduleone-error-analyzer/dist-ssr/
 
 # Logs and local files
 *.log
+*.txt
 *.local
 ScheduleOneErrorAnalyzerPlan.md
 

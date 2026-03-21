@@ -181,6 +181,11 @@ public sealed class ErrorAnalyzerMelon : MelonMod
                 "You installed both versions of the same mod",
                 diagnosis.SuggestedAction.Replace("`", string.Empty, StringComparison.Ordinal),
                 diagnosis.ModName),
+            RuleIds.ModInWrongFolder => new UserAdviceCard(
+                RuleIds.ModInWrongFolder,
+                "A mod file was put in the wrong folder",
+                "Move this file from Plugins into Mods, then start the game again.",
+                diagnosis.ModName),
             RuleIds.RuntimeMismatchMonoModOnIl2Cpp => new UserAdviceCard(
                 RuleIds.RuntimeMismatchMonoModOnIl2Cpp,
                 "Wrong version of a mod is installed",
@@ -204,9 +209,10 @@ public sealed class ErrorAnalyzerMelon : MelonMod
         return ruleId switch
         {
             RuleIds.DualRuntimeInstall => 0,
-            RuleIds.RuntimeMismatchMonoModOnIl2Cpp => 1,
-            RuleIds.MissingDependency => 2,
-            _ => 3,
+            RuleIds.ModInWrongFolder => 1,
+            RuleIds.RuntimeMismatchMonoModOnIl2Cpp => 2,
+            RuleIds.MissingDependency => 3,
+            _ => 4,
         };
     }
 }

@@ -318,6 +318,15 @@ function getFriendlyActionGroup(diagnosis: Diagnosis, modName: string): ActionGr
         explanation: 'Keep only the version that matches your current game type.',
         mods: [modName],
       }
+    case 'mod_in_wrong_folder':
+      return {
+        key: diagnosis.ruleId,
+        urgency: 'Quick fix',
+        title: 'A mod was installed into the wrong folder',
+        primaryAction: 'Move this file from `Plugins` into `Mods`, then try again.',
+        explanation: 'MelonLoader recognized this file as a mod, not a plugin.',
+        mods: [modName],
+      }
     case 'runtime_mismatch_mono_mod_on_il2cpp':
       return {
         key: diagnosis.ruleId,
@@ -335,6 +344,17 @@ function getFriendlyActionGroup(diagnosis: Diagnosis, modName: string): ActionGr
           title: 'A mod is missing SteamNetworkLib',
           primaryAction: 'Install SteamNetworkLib from `https://www.nexusmods.com/schedule1/mods/1396`, then try again.',
           explanation: 'This mod cannot start because SteamNetworkLib is missing.',
+          mods: [modName],
+        }
+      }
+
+      if (diagnosis.evidence.includes('UnhollowerBaseLib')) {
+        return {
+          key: diagnosis.ruleId,
+          urgency: 'Wrong build',
+          title: 'UnityExplorer is using an old dependency',
+          primaryAction: 'Install a newer UnityExplorer build that matches current Il2CppInterop-based MelonLoader.',
+          explanation: 'This copy still expects `UnhollowerBaseLib`, which belongs to older loader setups.',
           mods: [modName],
         }
       }
@@ -411,12 +431,14 @@ function getRulePriority(ruleId: string) {
   switch (ruleId) {
     case 'dual_runtime_install':
       return 0
-    case 'runtime_mismatch_mono_mod_on_il2cpp':
+    case 'mod_in_wrong_folder':
       return 1
-    case 'missing_dependency':
+    case 'runtime_mismatch_mono_mod_on_il2cpp':
       return 2
-    default:
+    case 'missing_dependency':
       return 3
+    default:
+      return 4
   }
 }
 

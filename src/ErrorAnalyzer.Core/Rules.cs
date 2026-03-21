@@ -8,6 +8,7 @@ public static class RuleIds
     public const string MissingPatchTarget = "missing_patch_target";
     public const string MissingMethod = "missing_method";
     public const string MissingDependency = "missing_dependency";
+    public const string ModInWrongFolder = "mod_in_wrong_folder";
     public const string RuntimeMismatchMonoModOnIl2Cpp = "runtime_mismatch_mono_mod_on_il2cpp";
     public const string OutdatedTypeReference = "outdated_type_reference";
     public const string FieldAccessorPatchBreak = "field_accessor_patch_break";
@@ -108,24 +109,112 @@ internal sealed class MissingMethodRule : IDetectionRule
 internal sealed class MissingDependencyRule : IDetectionRule
 {
     private static readonly Regex AssemblyRegex = new("'(?<assembly>[^']+)'", RegexOptions.Compiled);
+    private static readonly Regex MissingDependencyHeaderRegex = new(
+        @"-\s+'(?<mod>[^']+)'\s+is missing the following dependencies:",
+        RegexOptions.Compiled);
+    private static readonly Regex MissingDependencyItemRegex = new(
+        @"-\s+'(?<assembly>[^']+)'\s+v(?<version>\S+)",
+        RegexOptions.Compiled);
 
     public IEnumerable<Diagnosis> Analyze(LogDocument document)
     {
-        foreach (var line in document.Lines)
+        for (var index = 0; index < document.Lines.Count; index++)
         {
+            var line = document.Lines[index];
             if (!line.Text.Contains("System.IO.FileNotFoundException: Could not load file or assembly", StringComparison.Ordinal))
             {
+                var headerMatch = MissingDependencyHeaderRegex.Match(line.Text);
+                if (!headerMatch.Success)
+                {
+                    continue;
+                }
+
+                var modName = headerMatch.Groups["mod"].Value;
+                for (var dependencyIndex = index + 1; dependencyIndex < document.Lines.Count; dependencyIndex++)
+                {
+                    var dependencyLine = document.Lines[dependencyIndex];
+                    var dependencyMatch = MissingDependencyItemRegex.Match(dependencyLine.Text);
+                    if (!dependencyMatch.Success)
+                    {
+                        break;
+                    }
+
+                    var dependencyAssemblyName = dependencyMatch.Groups["assembly"].Value;
+                    yield return CreateDiagnosis(
+                        document,
+                        dependencyLine.Number - 1,
+                        modName,
+                        dependencyAssemblyName,
+                        dependencyLine.Number);
+                }
+
                 continue;
             }
 
             var match = AssemblyRegex.Match(line.Text);
             var assemblyName = match.Success ? match.Groups["assembly"].Value : "a required assembly";
-            yield return new Diagnosis(
-                RuleIds.MissingDependency,
-                "A required support file is missing",
-                $"This mod could not load one of the files it needs: `{assemblyName}`.",
-                "Reinstall the mod and its required dependencies, or remove it if you are unsure which extra file it needs.",
+            yield return CreateDiagnosis(
+                document,
+                line.Number - 1,
                 document.FindNearestModName(line.Number - 1),
+                assemblyName,
+                line.Number);
+        }
+    }
+
+    private static Diagnosis CreateDiagnosis(LogDocument document, int lineIndex, string? modName, string assemblyName, int lineNumber)
+    {
+        return new Diagnosis(
+            RuleIds.MissingDependency,
+            "A required support file is missing",
+            $"This mod could not load one of the files it needs: `{assemblyName}`.",
+            GetSuggestedAction(assemblyName),
+            modName ?? document.FindNearestModName(lineIndex),
+            $"Missing dependency `{assemblyName}`.",
+            lineNumber,
+            DiagnosisSeverity.Error,
+            DiagnosisConfidence.High);
+    }
+
+    private static string GetSuggestedAction(string assemblyName)
+    {
+        if (assemblyName.Contains("SteamNetworkLib", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Install or update `SteamNetworkLib`, then try again. If this mod still fails after that, remove or update the mod that depends on it.";
+        }
+
+        if (assemblyName.Contains("UnhollowerBaseLib", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Install a newer `UnityExplorer` build that matches current Il2CppInterop-based MelonLoader. Older Unhollower-based builds will not work here.";
+        }
+
+        return "Reinstall the mod and its required dependencies, or remove it if you are unsure which extra file it needs.";
+    }
+}
+
+internal sealed class ModInWrongFolderRule : IDetectionRule
+{
+    private static readonly Regex MelonNameRegex = new(@"Failed to load Melon '(?<mod>[^']+)'", RegexOptions.Compiled);
+
+    public IEnumerable<Diagnosis> Analyze(LogDocument document)
+    {
+        foreach (var line in document.Lines)
+        {
+            if (!line.Text.Contains("Failed to load Melon", StringComparison.Ordinal) ||
+                !line.Text.Contains("The given Melon is a Mod and cannot be loaded as a Plugin", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            var modMatch = MelonNameRegex.Match(line.Text);
+            var modName = modMatch.Success ? modMatch.Groups["mod"].Value : null;
+
+            yield return new Diagnosis(
+                RuleIds.ModInWrongFolder,
+                "This mod is in the wrong folder",
+                "This file was installed into the `Plugins` folder even though MelonLoader identifies it as a mod.",
+                "Move this file from `Plugins` into the `Mods` folder, then launch the game again.",
+                modName,
                 line.Text.Trim(),
                 line.Number,
                 DiagnosisSeverity.Error,

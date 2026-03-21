@@ -13,6 +13,7 @@ public sealed class LogAnalyzer
         : this(new IDetectionRule[]
         {
             new DualRuntimeInstallRule(),
+            new ModInWrongFolderRule(),
             new MissingPatchTargetRule(),
             new MissingMethodRule(),
             new MissingDependencyRule(),
@@ -95,6 +96,7 @@ public sealed class LogAnalyzer
         return rule switch
         {
             DualRuntimeInstallRule => "Checking duplicate mod installs",
+            ModInWrongFolderRule => "Checking mod folders",
             MissingPatchTargetRule => "Checking Harmony patch targets",
             MissingMethodRule => "Checking missing methods",
             MissingDependencyRule => "Checking missing dependencies",
