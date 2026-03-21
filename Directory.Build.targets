@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'ErrorAnalyzer.Core'">
+    <GeneratedErrorAnalyzerBuildInfoFile>$(IntermediateOutputPath)Generated\ErrorAnalyzerBuildInfo.g.cs</GeneratedErrorAnalyzerBuildInfoFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'ErrorAnalyzer.Core'">
+    <Compile Include="$(GeneratedErrorAnalyzerBuildInfoFile)" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="GenerateErrorAnalyzerBuildInfoSource"
+          BeforeTargets="BeforeCompile"
+          Condition="'$(MSBuildProjectName)' == 'ErrorAnalyzer.Core'">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(GeneratedErrorAnalyzerBuildInfoFile)'))" />
+    <ItemGroup>
+      <ErrorAnalyzerBuildInfoSource Include="namespace ErrorAnalyzer.Core" />
+      <ErrorAnalyzerBuildInfoSource Include="{" />
+      <ErrorAnalyzerBuildInfoSource Include="    public static class ErrorAnalyzerBuildInfo" />
+      <ErrorAnalyzerBuildInfoSource Include="    {" />
+      <ErrorAnalyzerBuildInfoSource Include="        public const string Version = &quot;$(ErrorAnalyzerVersion)&quot;%3B" />
+      <ErrorAnalyzerBuildInfoSource Include="    }" />
+      <ErrorAnalyzerBuildInfoSource Include="}" />
+    </ItemGroup>
+    <WriteLinesToFile
+      File="$(GeneratedErrorAnalyzerBuildInfoFile)"
+      Overwrite="true"
+      Lines="@(ErrorAnalyzerBuildInfoSource)" />
+  </Target>
+</Project>

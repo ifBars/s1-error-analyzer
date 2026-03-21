@@ -6,6 +6,7 @@ on:
       - 'release/**'
       - 'releases/**'
     paths:
+      - 'Directory.Build.props'
       - 'src/ErrorAnalyzer.Core/ErrorAnalyzer.Core.csproj'
   workflow_dispatch:
 
@@ -32,7 +33,7 @@ jobs:
         id: version
         shell: bash
         run: |
-          NEW_VERSION=$(grep -oPm1 '(?<=<Version>)[^<]+' src/ErrorAnalyzer.Core/ErrorAnalyzer.Core.csproj)
+          NEW_VERSION=$(grep -oPm1 '(?<=<ErrorAnalyzerVersion>)[^<]+' Directory.Build.props)
 
           if [[ -z "$NEW_VERSION" ]]; then
             echo "Unable to read current package version"
@@ -46,7 +47,7 @@ jobs:
             exit 0
           fi
 
-          OLD_VERSION=$(git show "${{ github.event.before }}:src/ErrorAnalyzer.Core/ErrorAnalyzer.Core.csproj" 2>/dev/null | grep -oPm1 '(?<=<Version>)[^<]+' || true)
+          OLD_VERSION=$(git show "${{ github.event.before }}:Directory.Build.props" 2>/dev/null | grep -oPm1 '(?<=<ErrorAnalyzerVersion>)[^<]+' || true)
 
           if [[ "$OLD_VERSION" == "$NEW_VERSION" ]]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -62,7 +63,7 @@ jobs:
 
       - name: Restore dependencies
         if: steps.version.outputs.changed == 'true'
-        run: dotnet restore tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj
+        run: dotnet restore ErrorAnalyzer.sln
 
       - name: Run core tests
         if: steps.version.outputs.changed == 'true'

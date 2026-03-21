@@ -1,10 +1,12 @@
 using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ErrorAnalyzer.Core;
 
 namespace ErrorAnalyzer.WASM;
 
+[SupportedOSPlatform("browser")]
 public partial class AnalyzerExports
 {
     private static readonly LogAnalyzer Analyzer = new();
@@ -25,7 +27,7 @@ public partial class AnalyzerExports
     [JSExport]
     public static string GetVersion()
     {
-        return "0.1.0-wasm";
+        return $"{ErrorAnalyzerBuildInfo.Version}-wasm";
     }
 
     private static void TryReportProgress(AnalysisProgress progress)

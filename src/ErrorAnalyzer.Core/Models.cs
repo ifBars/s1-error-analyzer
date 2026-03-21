@@ -31,9 +31,36 @@ public sealed record Diagnosis(
     int LineNumber,
     DiagnosisSeverity Severity,
     DiagnosisConfidence Confidence,
+    DiagnosisAdvice Advice,
     int OccurrenceCount = 1)
 {
     public string Fingerprint => $"{RuleId}|{ModName}|{Evidence}";
+
+    public Diagnosis(
+        string ruleId,
+        string title,
+        string message,
+        string suggestedAction,
+        string? modName,
+        string evidence,
+        int lineNumber,
+        DiagnosisSeverity severity,
+        DiagnosisConfidence confidence,
+        int occurrenceCount = 1)
+        : this(
+            ruleId,
+            title,
+            message,
+            suggestedAction,
+            modName,
+            evidence,
+            lineNumber,
+            severity,
+            confidence,
+            DiagnosisAdviceFactory.Generic(ruleId, title, message, suggestedAction),
+            occurrenceCount)
+    {
+    }
 }
 
 public sealed record LogAnalysisResult(
@@ -55,7 +82,8 @@ public sealed record DiagnosisDto(
     int LineNumber,
     string Severity,
     string Confidence,
-    int OccurrenceCount);
+    int OccurrenceCount,
+    DiagnosisAdvice Advice);
 
 public sealed record LogAnalysisResultDto(
     string SourceName,

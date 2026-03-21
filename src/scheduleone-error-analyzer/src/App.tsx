@@ -229,11 +229,11 @@ function App() {
                 <details key={modName} className="detail-item">
                   <summary>
                     <span>{modName}</span>
-                    <span>{primary.title}</span>
+                    <span>{primary.advice.title}</span>
                   </summary>
                   <div className="detail-body">
                     <p>{primary.message}</p>
-                    <p className="detail-action">{primary.suggestedAction}</p>
+                    <p className="detail-action">{primary.advice.primaryAction}</p>
                     {detailSummaries.map((summary) => (
                       <div key={summary.key} className="detail-evidence-block">
                         <p className="detail-meta">
@@ -271,6 +271,7 @@ function clampProgress(progress: number) {
 
 type ActionGroup = {
   key: string
+  priority: number
   urgency: string
   title: string
   primaryAction: string
@@ -304,78 +305,18 @@ function buildActionGroups(diagnoses: Diagnosis[]): ActionGroup[] {
     groups.set(entry.key, entry)
   }
 
-  return [...groups.values()].sort((left, right) => getRulePriority(left.key) - getRulePriority(right.key))
+  return [...groups.values()].sort((left, right) => left.priority - right.priority)
 }
 
 function getFriendlyActionGroup(diagnosis: Diagnosis, modName: string): ActionGroup {
-  switch (diagnosis.ruleId) {
-    case 'dual_runtime_install':
-      return {
-        key: diagnosis.ruleId,
-        urgency: 'Most likely fix',
-        title: 'You installed both versions of the same mod',
-        primaryAction: diagnosis.suggestedAction,
-        explanation: 'Keep only the version that matches your current game type.',
-        mods: [modName],
-      }
-    case 'mod_in_wrong_folder':
-      return {
-        key: diagnosis.ruleId,
-        urgency: 'Quick fix',
-        title: 'A mod was installed into the wrong folder',
-        primaryAction: 'Move this file from `Plugins` into `Mods`, then try again.',
-        explanation: 'MelonLoader recognized this file as a mod, not a plugin.',
-        mods: [modName],
-      }
-    case 'runtime_mismatch_mono_mod_on_il2cpp':
-      return {
-        key: diagnosis.ruleId,
-        urgency: 'Most likely fix',
-        title: 'You have the wrong version of a mod installed',
-        primaryAction: 'Look for a version of this mod that says `Il2Cpp`. If you cannot find one, remove the mod.',
-        explanation: 'The installed copy was built for a different game setup.',
-        mods: [modName],
-      }
-    case 'missing_dependency':
-      if (diagnosis.evidence.includes('SteamNetworkLib')) {
-        return {
-          key: diagnosis.ruleId,
-          urgency: 'Needs reinstall',
-          title: 'A mod is missing SteamNetworkLib',
-          primaryAction: 'Install SteamNetworkLib from `https://www.nexusmods.com/schedule1/mods/1396`, then try again.',
-          explanation: 'This mod cannot start because SteamNetworkLib is missing.',
-          mods: [modName],
-        }
-      }
-
-      if (diagnosis.evidence.includes('UnhollowerBaseLib')) {
-        return {
-          key: diagnosis.ruleId,
-          urgency: 'Wrong build',
-          title: 'UnityExplorer is using an old dependency',
-          primaryAction: 'Install a newer UnityExplorer build that matches current Il2CppInterop-based MelonLoader.',
-          explanation: 'This copy still expects `UnhollowerBaseLib`, which belongs to older loader setups.',
-          mods: [modName],
-        }
-      }
-
-      return {
-        key: diagnosis.ruleId,
-        urgency: 'Needs reinstall',
-        title: 'A mod is missing a required file',
-        primaryAction: 'Reinstall this mod and any required support mods. If you are unsure which file is missing, remove the mod.',
-        explanation: 'The mod cannot start because one of its required files is not present.',
-        mods: [modName],
-      }
-    default:
-      return {
-        key: 'outdated_mods',
-        urgency: 'Most likely fix',
-        title: 'One or more mods are outdated after a game update',
-        primaryAction: 'Remove these mods for now, or update them if newer versions are available.',
-        explanation: 'These mods are trying to use game code that changed in a recent update.',
-        mods: [modName],
-      }
+  return {
+    key: diagnosis.advice.groupKey,
+    priority: diagnosis.advice.priority,
+    urgency: diagnosis.advice.urgency,
+    title: diagnosis.advice.title,
+    primaryAction: diagnosis.advice.primaryAction,
+    explanation: diagnosis.advice.explanation,
+    mods: [modName],
   }
 }
 
@@ -393,14 +334,14 @@ function groupDiagnosesByMod(diagnoses: Diagnosis[]) {
 }
 
 function choosePrimaryDiagnosis(diagnoses: Diagnosis[]) {
-  return [...diagnoses].sort((left, right) => getRulePriority(left.ruleId) - getRulePriority(right.ruleId))[0]
+  return [...diagnoses].sort((left, right) => left.advice.priority - right.advice.priority)[0]
 }
 
 function buildDetailSummaries(diagnoses: Diagnosis[]): DetailSummary[] {
   const grouped = new Map<string, { title: string; totalOccurrences: number; evidenceSamples: string[] }>()
 
   for (const diagnosis of diagnoses) {
-    const key = `${diagnosis.ruleId}|${diagnosis.title}|${diagnosis.suggestedAction}`
+    const key = `${diagnosis.advice.groupKey}|${diagnosis.title}|${diagnosis.suggestedAction}`
     const existing = grouped.get(key)
 
     if (existing) {
@@ -425,21 +366,6 @@ function buildDetailSummaries(diagnoses: Diagnosis[]): DetailSummary[] {
     evidenceSamples: summary.evidenceSamples.slice(0, 6),
     hiddenEvidenceCount: Math.max(summary.evidenceSamples.length - 6, 0),
   }))
-}
-
-function getRulePriority(ruleId: string) {
-  switch (ruleId) {
-    case 'dual_runtime_install':
-      return 0
-    case 'mod_in_wrong_folder':
-      return 1
-    case 'runtime_mismatch_mono_mod_on_il2cpp':
-      return 2
-    case 'missing_dependency':
-      return 3
-    default:
-      return 4
-  }
 }
 
 function readFileText(file: File, onProgress?: (progress: number) => void) {

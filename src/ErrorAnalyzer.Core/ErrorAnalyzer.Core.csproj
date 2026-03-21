@@ -1,12 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>ScheduleOne.ErrorAnalyzer.Core</PackageId>
-    <Version>0.1.0</Version>
+    <Version>$(ErrorAnalyzerVersion)</Version>
     <Title>Schedule One Error Analyzer Core</Title>
     <Description>Shared rule-based log analyzer for Schedule One mod and support tooling.</Description>
     <Authors>OpenCode</Authors>
@@ -17,7 +14,6 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Deterministic>true</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>

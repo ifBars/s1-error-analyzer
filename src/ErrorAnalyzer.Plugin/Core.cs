@@ -2,7 +2,7 @@ using ErrorAnalyzer.Core;
 using MelonLoader;
 using MelonLoader.Utils;
 
-[assembly: MelonInfo(typeof(ErrorAnalyzer.Plugin.ErrorAnalyzerMelon), "ErrorAnalyzer", "0.1.0", "OpenCode")]
+[assembly: MelonInfo(typeof(ErrorAnalyzer.Plugin.ErrorAnalyzerMelon), "ErrorAnalyzer", ErrorAnalyzerBuildInfo.Version, "OpenCode")]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
 namespace ErrorAnalyzer.Plugin;
@@ -151,7 +151,7 @@ public sealed class ErrorAnalyzerMelon : MelonMod
     private static string FormatDiagnosis(Diagnosis diagnosis)
     {
         var owner = string.IsNullOrWhiteSpace(diagnosis.ModName) ? "unknown mod" : diagnosis.ModName;
-        return $"{owner}: {diagnosis.SuggestedAction}";
+        return $"{owner}: {diagnosis.Advice.PrimaryAction}";
     }
 
     private static IReadOnlyList<UserAdviceCard> BuildAdviceCards(IReadOnlyList<Diagnosis> diagnoses)
@@ -161,59 +161,20 @@ public sealed class ErrorAnalyzerMelon : MelonMod
         foreach (var group in diagnoses.GroupBy(diagnosis => diagnosis.ModName ?? "Unknown mod", StringComparer.OrdinalIgnoreCase))
         {
             var primaryDiagnosis = group
-                .OrderBy(diagnosis => GetRulePriority(diagnosis.RuleId))
+                .OrderBy(diagnosis => diagnosis.Advice.Priority)
                 .First();
 
             cards.Add(CreateAdviceCard(primaryDiagnosis));
         }
 
         return cards
-            .OrderBy(card => GetRulePriority(card.Key))
+            .OrderBy(card => card.Priority)
             .ToArray();
     }
 
     private static UserAdviceCard CreateAdviceCard(Diagnosis diagnosis)
     {
-        return diagnosis.RuleId switch
-        {
-            RuleIds.DualRuntimeInstall => new UserAdviceCard(
-                RuleIds.DualRuntimeInstall,
-                "You installed both versions of the same mod",
-                diagnosis.SuggestedAction.Replace("`", string.Empty, StringComparison.Ordinal),
-                diagnosis.ModName),
-            RuleIds.ModInWrongFolder => new UserAdviceCard(
-                RuleIds.ModInWrongFolder,
-                "A mod file was put in the wrong folder",
-                "Move this file from Plugins into Mods, then start the game again.",
-                diagnosis.ModName),
-            RuleIds.RuntimeMismatchMonoModOnIl2Cpp => new UserAdviceCard(
-                RuleIds.RuntimeMismatchMonoModOnIl2Cpp,
-                "Wrong version of a mod is installed",
-                "Look for a version of this mod labeled 'Il2Cpp'. If you cannot find one, remove it.",
-                diagnosis.ModName),
-            RuleIds.MissingDependency => new UserAdviceCard(
-                RuleIds.MissingDependency,
-                "A mod is missing a required file",
-                "Reinstall this mod and any required support mods. If you are unsure what is missing, remove it.",
-                diagnosis.ModName),
-            _ => new UserAdviceCard(
-                "outdated-mod",
-                "This mod is outdated after a game update",
-                "Update this mod if a newer version exists. If not, remove it for now.",
-                diagnosis.ModName),
-        };
-    }
-
-    private static int GetRulePriority(string ruleId)
-    {
-        return ruleId switch
-        {
-            RuleIds.DualRuntimeInstall => 0,
-            RuleIds.ModInWrongFolder => 1,
-            RuleIds.RuntimeMismatchMonoModOnIl2Cpp => 2,
-            RuleIds.MissingDependency => 3,
-            _ => 4,
-        };
+        return new UserAdviceCard(diagnosis.Advice, diagnosis.ModName);
     }
 }
 
@@ -277,16 +238,19 @@ internal static class GuiBridge
 
 internal sealed class UserAdviceCard
 {
-    public UserAdviceCard(string key, string title, string primaryAction, string? modName)
+    public UserAdviceCard(DiagnosisAdvice advice, string? modName)
     {
-        Key = key;
-        Title = title;
-        PrimaryAction = primaryAction;
+        Key = advice.GroupKey;
+        Priority = advice.Priority;
+        Title = advice.Title;
+        PrimaryAction = advice.PrimaryAction;
         ModNames = new List<string>();
         AddMod(modName);
     }
 
     public string Key { get; }
+
+    public int Priority { get; }
 
     public string Title { get; }
 

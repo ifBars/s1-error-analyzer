@@ -6,10 +6,12 @@
     "src/scheduleone-error-analyzer"
   ],
   "scripts": {
+    "restore:dotnet": "dotnet restore ErrorAnalyzer.sln",
     "dev": "bun scripts/run-frontend.mjs dev",
     "build": "bun scripts/run-frontend.mjs build",
     "build:pages": "bun scripts/run-frontend.mjs build:pages",
     "lint": "bun scripts/run-frontend.mjs lint",
-    "test": "dotnet test tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj"
+    "test": "dotnet test tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj",
+    "test:workspace": "dotnet test ErrorAnalyzer.sln"
   }
 }

@@ -1,6 +1,14 @@
 export type RuntimeKind = 'Unknown' | 'Mono' | 'Il2Cpp'
 export type DiagnosisSeverity = 'Info' | 'Warning' | 'Error'
 export type DiagnosisConfidence = 'Low' | 'Medium' | 'High'
+export type DiagnosisAdvice = {
+  groupKey: string
+  priority: number
+  urgency: string
+  title: string
+  primaryAction: string
+  explanation: string
+}
 
 export type Diagnosis = {
   ruleId: string
@@ -13,6 +21,7 @@ export type Diagnosis = {
   severity: DiagnosisSeverity
   confidence: DiagnosisConfidence
   occurrenceCount: number
+  advice: DiagnosisAdvice
 }
 
 export type AnalysisResult = {

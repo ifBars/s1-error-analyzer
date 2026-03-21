@@ -1,0 +1,90 @@
+using ErrorAnalyzer.Core;
+using Xunit;
+
+namespace ErrorAnalyzer.Core.Tests;
+
+public sealed class DiagnosisAdviceTests
+{
+    private readonly LogAnalyzer _analyzer = new();
+
+    [Fact]
+    public void MissingDependencyRuleProvidesSpecificDependencyGuidance()
+    {
+        var result = Analyze("Latest (22).log");
+        var diagnosis = result.Diagnoses.First(x =>
+            x.RuleId == RuleIds.MissingDependency &&
+            x.Evidence.Contains("SteamNetworkLib", StringComparison.Ordinal));
+        var advice = diagnosis.Advice;
+
+        Assert.Equal("missing_dependency:steamnetworklib", advice.GroupKey);
+        Assert.Equal(3, advice.Priority);
+        Assert.Equal("A mod is missing SteamNetworkLib", advice.Title);
+        Assert.Contains("SteamNetworkLib", advice.PrimaryAction, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void OutdatedRuleProvidesSharedAdviceGroup()
+    {
+        var result = Analyze("Latest (22).log");
+        var diagnosis = Assert.Single(result.Diagnoses, x =>
+            x.RuleId == RuleIds.MissingMethod &&
+            x.Evidence.Contains("ItemDefinition.get_LabelDisplayColor", StringComparison.Ordinal));
+        var advice = diagnosis.Advice;
+
+        Assert.Equal("outdated_mods", advice.GroupKey);
+        Assert.Equal(4, advice.Priority);
+        Assert.Equal("One or more mods are outdated after a game update", advice.Title);
+    }
+
+    [Fact]
+    public void MapsDiagnosisDtosWithSharedAdvicePayload()
+    {
+        var diagnosis = new Diagnosis(
+            RuleIds.ModInWrongFolder,
+            "This mod is in the wrong folder",
+            "This file was installed into the `Plugins` folder even though MelonLoader identifies it as a mod.",
+            "Move this file from `Plugins` into the `Mods` folder, then launch the game again.",
+            "S1API",
+            "Failed to load Melon 'S1API' from '.\\Plugins\\S1API.dll': The given Melon is a Mod and cannot be loaded as a Plugin.",
+            10,
+            DiagnosisSeverity.Error,
+            DiagnosisConfidence.High,
+            new DiagnosisAdvice(
+                RuleIds.ModInWrongFolder,
+                1,
+                "Quick fix",
+                "A mod was installed into the wrong folder",
+                "Move this file from Plugins into Mods, then try again.",
+                "MelonLoader recognized this file as a mod, not a plugin."));
+
+        var dto = LogAnalysisResultMapper.ToDto(new LogAnalysisResult("sample.log", RuntimeKind.Il2Cpp, new[] { diagnosis }));
+        var dtoDiagnosis = Assert.Single(dto.Diagnoses);
+
+        Assert.Equal("mod_in_wrong_folder", dtoDiagnosis.Advice.GroupKey);
+        Assert.Equal(1, dtoDiagnosis.Advice.Priority);
+        Assert.Equal("A mod was installed into the wrong folder", dtoDiagnosis.Advice.Title);
+    }
+
+    private LogAnalysisResult Analyze(string fileName)
+    {
+        var path = Path.Combine(FindErrorLogsDirectory(), fileName);
+        return _analyzer.AnalyzeFile(path);
+    }
+
+    private static string FindErrorLogsDirectory()
+    {
+        var directory = AppContext.BaseDirectory;
+        while (!string.IsNullOrEmpty(directory))
+        {
+            var candidate = Path.GetFullPath(Path.Combine(directory, "..", "..", "..", "..", "ErrorLogs"));
+            if (Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            directory = Path.GetDirectoryName(directory);
+        }
+
+        throw new DirectoryNotFoundException("Could not find ErrorLogs directory.");
+    }
+}
