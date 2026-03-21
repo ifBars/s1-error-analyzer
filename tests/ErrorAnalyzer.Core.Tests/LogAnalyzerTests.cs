@@ -137,6 +137,20 @@ public sealed class LogAnalyzerTests
             x.Evidence.Contains("GameInput::get_MouseWheelAxis", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void DoesNotUseGenericClassNamesAsModNames()
+    {
+        var result = Analyze("new.log");
+
+        Assert.Contains(result.Diagnoses, x =>
+            x.RuleId == RuleIds.MissingMethod &&
+            string.Equals(x.ModName, "Low_End", StringComparison.Ordinal) &&
+            x.Evidence.Contains("Resources.FindObjectsOfTypeAll", StringComparison.Ordinal));
+
+        Assert.DoesNotContain(result.Diagnoses, x =>
+            string.Equals(x.ModName, "Class1", StringComparison.Ordinal));
+    }
+
     private LogAnalysisResult Analyze(string fileName)
     {
         var logDirectory = FindErrorLogsDirectory();

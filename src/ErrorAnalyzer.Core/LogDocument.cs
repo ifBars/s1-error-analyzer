@@ -9,7 +9,7 @@ internal sealed class LogDocument
     private static readonly Regex TimestampOnlyRegex = new(@"^\d{1,2}:\d{1,2}:\d{1,2}(?:\.\d+)?$", RegexOptions.Compiled);
     private static readonly Regex TimestampedModRegex = new(@"^\[[^\]]+\]\s+\[(?<mod>[^\]]+)\]", RegexOptions.Compiled);
     private static readonly Regex UntimestampedModRegex = new(@"^\[(?<mod>[^\]]+)\]", RegexOptions.Compiled);
-    private static readonly Regex StackFrameRegex = new(@"\bat\s+(?<type>[A-Za-z0-9_`]+(?:\.[A-Za-z0-9_`]+)+)", RegexOptions.Compiled);
+    private static readonly Regex StackFrameRegex = new(@"\bat\s+(?<symbol>[A-Za-z0-9_`]+(?:\.[A-Za-z0-9_`]+)+)", RegexOptions.Compiled);
     private static readonly Regex AssemblyRegex = new(@"assembly\s+(?<assembly>[^,]+),\s+Version=", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly HashSet<string> InfrastructurePrefixes = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -58,17 +58,13 @@ internal sealed class LogDocument
 
         foreach (var candidate in EnumerateNearbyLines(lineIndex, searchRadius, allowForwardSearch))
         {
-            var typeName = TryExtractTypeName(candidate.Text);
-            if (string.IsNullOrWhiteSpace(typeName))
+            var stackOwner = TryExtractStackOwner(candidate.Text);
+            if (string.IsNullOrWhiteSpace(stackOwner))
             {
                 continue;
             }
 
-            var prefix = typeName.Split('.')[0];
-            if (!InfrastructurePrefixes.Contains(prefix))
-            {
-                return prefix;
-            }
+            return stackOwner;
         }
 
         foreach (var candidate in EnumerateNearbyLines(lineIndex, searchRadius, allowForwardSearch))
@@ -176,10 +172,23 @@ internal sealed class LogDocument
         return trimmed;
     }
 
-    private static string? TryExtractTypeName(string text)
+    private static string? TryExtractStackOwner(string text)
     {
         var match = StackFrameRegex.Match(text);
-        return match.Success ? match.Groups["type"].Value : null;
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        var symbol = match.Groups["symbol"].Value;
+        var segments = symbol.Split('.');
+        if (segments.Length < 3)
+        {
+            return null;
+        }
+
+        var owner = segments[0];
+        return InfrastructurePrefixes.Contains(owner) ? null : owner;
     }
 
     private static string? NormalizeAssemblyName(string value)
