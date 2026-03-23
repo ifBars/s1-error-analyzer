@@ -8,7 +8,7 @@ const distDir = path.join(process.cwd(), 'src', 'scheduleone-error-analyzer', 'd
 const docsOutputDir = path.join(distDir, 'docs', 'core')
 
 run('bun', ['scripts/run-frontend.mjs', 'build:pages', repoName].filter(Boolean))
-run('node', ['scripts/generate-core-docs.mjs', '--base', basePath, '--output', docsOutputDir])
+run('bun', ['scripts/generate-core-docs.mjs', '--base', basePath, '--output', docsOutputDir])
 mkdirSync(distDir, { recursive: true })
 writeFileSync(path.join(distDir, '.nojekyll'), '', 'utf8')
 

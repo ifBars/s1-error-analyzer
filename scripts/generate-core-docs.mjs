@@ -10,6 +10,7 @@ const directoryBuildPropsPath = path.join(repoRoot, 'Directory.Build.props')
 
 const args = parseArgs(process.argv.slice(2))
 const outputDir = path.resolve(repoRoot, args.output ?? defaultOutputDir)
+validateOutputDir(outputDir, args.output, defaultOutputDir)
 const basePath = normalizeBasePath(args.base ?? '/')
 
 const projectMetadata = readProjectMetadata(csprojPath, directoryBuildPropsPath)
@@ -51,6 +52,23 @@ function parseArgs(argv) {
   }
 
   return parsed
+}
+
+function validateOutputDir(outputDir, userOutput, fallbackOutputDir) {
+  const outputDirRelative = path.relative(repoRoot, outputDir)
+  const outputDirPathEscapesRepo =
+    outputDirRelative === '' ||
+    outputDirRelative === '.' ||
+    outputDirRelative === '..' ||
+    outputDirRelative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(outputDirRelative) ||
+    path.parse(outputDir).root === path.normalize(outputDir)
+
+  if (outputDirPathEscapesRepo) {
+    throw new Error(
+      `[core-docs] Refusing to delete unsafe output directory ${outputDir}. args.output=${userOutput ?? '<not set>'}, defaultOutputDir=${fallbackOutputDir}, repoRoot=${repoRoot}. Output path must be inside repoRoot and must not resolve to the repository root or filesystem root.`,
+    )
+  }
 }
 
 function normalizeBasePath(value) {
@@ -274,7 +292,7 @@ function parseMembers(bodyLines, typeName) {
       continue
     }
 
-    if (depth === 1 && trimmed.startsWith('public ')) {
+    if (depth === 0 && trimmed.startsWith('public ')) {
       const declaration = collectMemberDeclaration(bodyLines, index)
       members.push({
         kind: classifyMember(declaration.text, typeName),

@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 namespace ErrorAnalyzer.Core;
 
 /// <summary>
@@ -82,7 +85,15 @@ public sealed record Diagnosis(
     /// <summary>
     /// Gets a stable identifier for deduplicating repeated findings.
     /// </summary>
-    public string Fingerprint => $"{RuleId}|{ModName}|{Evidence}";
+    public string Fingerprint => BuildFingerprint(RuleId, ModName, Evidence);
+
+    private static string BuildFingerprint(string ruleId, string? modName, string evidence)
+    {
+        var normalizedModName = modName ?? string.Empty;
+        var payload = $"{ruleId.Length}:{ruleId}|{normalizedModName.Length}:{normalizedModName}|{evidence.Length}:{evidence}";
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(payload));
+        return BitConverter.ToString(hash).Replace("-", string.Empty);
+    }
 
     /// <summary>
     /// Creates a diagnosis using a generated generic advice payload.
