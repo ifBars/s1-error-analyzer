@@ -27,6 +27,8 @@ dotnet workload restore src/ErrorAnalyzer.WASM/ErrorAnalyzer.WASM.csproj
 bun run dev
 bun run build
 bun run build:pages s1-error-analyzer
+bun run build:pages:site s1-error-analyzer
+bun run build:core-docs
 bun run lint
 dotnet test tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj
 bun run test:workspace
@@ -51,4 +53,4 @@ bun run test:workspace
 
 ## GitHub Pages
 
-The GitHub Pages workflow lives at `.github/workflows/deploy-pages.yml` and builds the frontend from the workspace root before uploading `src/scheduleone-error-analyzer/dist`.
+The GitHub Pages workflow lives at `.github/workflows/deploy-pages.yml` and publishes both the React analyzer app and generated `ErrorAnalyzer.Core` documentation in one static site. Use `bun run build:pages:site s1-error-analyzer` to build the combined Pages output locally; the analyzer is served from the site root and the generated core docs are emitted under `docs/core/`.

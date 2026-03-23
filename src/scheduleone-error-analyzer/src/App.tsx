@@ -14,6 +14,7 @@ function App() {
   const [analysisProgress, setAnalysisProgress] = useState<AnalysisProgress | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
+  const [hasDeveloperDocs, setHasDeveloperDocs] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -60,6 +61,33 @@ function App() {
   const modGroups = useMemo(() => groupDiagnosesByMod(result?.diagnoses ?? []), [result])
   const progressValue = clampProgress(analysisProgress?.progress ?? 0)
   const progressPercent = Math.round(progressValue * 100)
+  const baseUrl = import.meta.env.BASE_URL === '/' ? '/' : `${import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`}`
+  const developerDocsHref = `${baseUrl}docs/core/`
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      return
+    }
+
+    let cancelled = false
+
+    void (async () => {
+      try {
+        const response = await fetch(`${developerDocsHref}index.html`, { method: 'HEAD' })
+        if (!cancelled) {
+          setHasDeveloperDocs(response.ok)
+        }
+      } catch {
+        if (!cancelled) {
+          setHasDeveloperDocs(false)
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [developerDocsHref])
 
   async function handleFileSelect(file: File | null) {
     if (!file) {
@@ -125,6 +153,16 @@ function App() {
       <header className="page-header">
         <p className="eyebrow">Schedule 1 Error Analyzer</p>
         <h1>Drop in `Latest.log` and get the first fix to try.</h1>
+        <p className="hero-copy">
+          Need integration details for the shared core library? The generated developer docs are published alongside this in-browser analyzer.
+        </p>
+        <div className="header-links">
+          {hasDeveloperDocs ? (
+            <a className="pill-link" href={developerDocsHref}>
+              Open core library docs
+            </a>
+          ) : null}
+        </div>
       </header>
 
       <section className="section-block">

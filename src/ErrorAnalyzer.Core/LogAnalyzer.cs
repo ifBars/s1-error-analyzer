@@ -2,6 +2,9 @@ using System.Threading.Tasks;
 
 namespace ErrorAnalyzer.Core;
 
+/// <summary>
+/// Entry point for parsing Schedule 1 logs and producing diagnoses.
+/// </summary>
 public sealed class LogAnalyzer
 {
     private readonly IReadOnlyList<IDetectionRule> _rules;
@@ -9,6 +12,9 @@ public sealed class LogAnalyzer
     private const double RuleProgressStart = 0.2;
     private const double RuleProgressRange = 0.68;
 
+    /// <summary>
+    /// Creates a log analyzer with the built-in rule set.
+    /// </summary>
     public LogAnalyzer()
         : this(new IDetectionRule[]
         {
@@ -29,6 +35,9 @@ public sealed class LogAnalyzer
         _rules = rules;
     }
 
+    /// <summary>
+    /// Analyzes raw log text and returns the normalized result.
+    /// </summary>
     public LogAnalysisResult AnalyzeText(string text, string sourceName, Action<AnalysisProgress>? reportProgress = null)
     {
         reportProgress?.Invoke(new AnalysisProgress("Parsing log", 0.05));
@@ -50,15 +59,27 @@ public sealed class LogAnalyzer
         return new LogAnalysisResult(sourceName, document.Runtime, aggregatedDiagnoses);
     }
 
+    /// <summary>
+    /// Reads and analyzes a log file from disk.
+    /// </summary>
     public LogAnalysisResult AnalyzeFile(string path)
         => AnalyzeText(File.ReadAllText(path), Path.GetFileName(path));
 
+    /// <summary>
+    /// Analyzes raw log text and converts the result into the DTO shape.
+    /// </summary>
     public LogAnalysisResultDto AnalyzeTextAsDto(string text, string sourceName)
         => LogAnalysisResultMapper.ToDto(AnalyzeText(text, sourceName));
 
+    /// <summary>
+    /// Analyzes raw log text, reports progress, and converts the result into the DTO shape.
+    /// </summary>
     public LogAnalysisResultDto AnalyzeTextAsDto(string text, string sourceName, Action<AnalysisProgress>? reportProgress)
         => LogAnalysisResultMapper.ToDto(AnalyzeText(text, sourceName, reportProgress));
 
+    /// <summary>
+    /// Asynchronously analyzes raw log text and reports progress to asynchronous callers.
+    /// </summary>
     public async Task<LogAnalysisResultDto> AnalyzeTextAsDtoAsync(
         string text,
         string sourceName,
@@ -88,6 +109,9 @@ public sealed class LogAnalyzer
         return LogAnalysisResultMapper.ToDto(new LogAnalysisResult(sourceName, document.Runtime, aggregatedDiagnoses));
     }
 
+    /// <summary>
+    /// Reads and analyzes a log file from disk, returning the DTO shape.
+    /// </summary>
     public LogAnalysisResultDto AnalyzeFileAsDto(string path)
         => LogAnalysisResultMapper.ToDto(AnalyzeFile(path));
 

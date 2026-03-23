@@ -9,6 +9,17 @@
   gap: 8px;
 }
 
+.hero-copy {
+  max-width: 52rem;
+  color: var(--text-soft);
+}
+
+.header-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .eyebrow,
 .section-step,
 .label,
@@ -40,7 +51,8 @@
   flex-wrap: wrap;
 }
 
-button {
+button,
+.pill-link {
   border: 1px solid var(--border-strong);
   background: transparent;
   color: var(--text-h);
@@ -49,6 +61,7 @@ button {
   font: inherit;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  text-decoration: none;
 }
 
 button:disabled {
