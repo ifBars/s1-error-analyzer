@@ -91,7 +91,8 @@ public sealed record Diagnosis(
     {
         var normalizedModName = modName ?? string.Empty;
         var payload = $"{ruleId.Length}:{ruleId}|{normalizedModName.Length}:{normalizedModName}|{evidence.Length}:{evidence}";
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(payload));
+        using var sha256 = SHA256.Create();
+        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(payload));
         return BitConverter.ToString(hash).Replace("-", string.Empty);
     }
 
