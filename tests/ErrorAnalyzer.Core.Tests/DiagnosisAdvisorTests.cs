@@ -1,5 +1,6 @@
 using ErrorAnalyzer.Core;
 using ErrorAnalyzer.Core.Analysis;
+using ErrorAnalyzer.Core.Models;
 using ErrorAnalyzer.Core.Presentation;
 using ErrorAnalyzer.Core.Rules;
 using Xunit;

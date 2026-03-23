@@ -3,6 +3,7 @@ using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Threading.Tasks;
 using ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Models;
 
 namespace ErrorAnalyzer.WASM;
 

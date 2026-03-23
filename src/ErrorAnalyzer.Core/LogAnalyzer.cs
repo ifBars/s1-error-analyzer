@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
 using ErrorAnalyzer.Core.Analysis;
+using ErrorAnalyzer.Core.Models;
+using ErrorAnalyzer.Core.Parsing;
 using ErrorAnalyzer.Core.Rules;
 
 namespace ErrorAnalyzer.Core;

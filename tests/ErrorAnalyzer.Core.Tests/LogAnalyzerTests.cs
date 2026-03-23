@@ -1,4 +1,7 @@
 using ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Models;
+using ErrorAnalyzer.Core.Parsing;
+using ErrorAnalyzer.Core.Runtime;
 using ErrorAnalyzer.Core.Rules;
 using Xunit;
 

@@ -1,3 +1,5 @@
+using ErrorAnalyzer.Core.Models;
+
 namespace ErrorAnalyzer.Core.Analysis;
 
 internal sealed class DiagnosisAggregator

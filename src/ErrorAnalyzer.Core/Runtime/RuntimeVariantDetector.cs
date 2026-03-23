@@ -1,4 +1,6 @@
-namespace ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Parsing;
+
+namespace ErrorAnalyzer.Core.Runtime;
 
 internal static class RuntimeVariantDetector
 {

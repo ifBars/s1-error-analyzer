@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Models;
 using ErrorAnalyzer.Core.Presentation;
 
 namespace ErrorAnalyzer.WASM;
