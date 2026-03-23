@@ -1,7 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
+  color: #315463;
+  background: #eef7fb;
+
   --bg: #eef7fb;
+  --bg-glow-1: rgba(42, 128, 168, 0.08);
+  --bg-glow-2: rgba(107, 184, 156, 0.09);
   --text: #315463;
   --text-h: #153948;
   --text-soft: #5f7d89;
@@ -11,18 +16,55 @@
   --accent-2: #6bb89c;
   --warning: #a85d42;
   --code-bg: rgba(21, 57, 72, 0.06);
-
-  --sans: 'Outfit', 'Segoe UI', sans-serif;
-  --heading: 'Outfit', 'Segoe UI', sans-serif;
-  --mono: 'Space Mono', monospace;
+  --selection: rgba(42, 128, 168, 0.2);
+  --focus-ring: rgba(42, 128, 168, 0.45);
 
   font: 17px/1.55 var(--sans);
-  color: var(--text);
-  background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --sans: 'Outfit', 'Segoe UI', sans-serif;
+  --heading: 'Outfit', 'Segoe UI', sans-serif;
+  --mono: 'Space Mono', monospace;
+}
+
+:root,
+[data-theme='light'] {
+  --bg: #eef7fb;
+  --bg-glow-1: transparent;
+  --bg-glow-2: transparent;
+  --text: #315463;
+  --text-h: #153948;
+  --text-soft: #5f7d89;
+  --border: rgba(21, 57, 72, 0.12);
+  --border-strong: rgba(21, 57, 72, 0.22);
+  --accent: #2a80a8;
+  --accent-2: #6bb89c;
+  --warning: #a85d42;
+  --code-bg: rgba(21, 57, 72, 0.06);
+  --selection: rgba(42, 128, 168, 0.2);
+  --focus-ring: rgba(42, 128, 168, 0.45);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #1b1f25;
+  --bg-glow-1: transparent;
+  --bg-glow-2: transparent;
+  --text: #d3d6db;
+  --text-h: #eff1f5;
+  --text-soft: #9ba1ad;
+  --border: rgba(238, 240, 244, 0.2);
+  --border-strong: rgba(238, 240, 244, 0.36);
+  --accent: #8d94a0;
+  --accent-2: #6e7480;
+  --warning: #b37f65;
+  --code-bg: rgba(255, 255, 255, 0.08);
+  --selection: rgba(140, 151, 167, 0.28);
+  --focus-ring: rgba(164, 177, 192, 0.45);
+  color-scheme: dark;
 }
 
 * {
@@ -33,16 +75,15 @@ html,
 body {
   margin: 0;
   min-width: 320px;
-  background:
-    radial-gradient(circle at top left, rgba(42, 128, 168, 0.08), transparent 24%),
-    radial-gradient(circle at top right, rgba(107, 184, 156, 0.09), transparent 22%),
-    #eef7fb;
+  background: var(--bg);
+  min-height: 100svh;
 }
 
 #root {
   width: min(980px, 100%);
   margin: 0 auto;
   min-height: 100svh;
+  background: transparent;
 }
 
 h1,
@@ -90,5 +131,5 @@ code {
 }
 
 ::selection {
-  background: rgba(42, 128, 168, 0.2);
+  background: var(--selection);
 }

@@ -64,6 +64,26 @@ button,
   text-decoration: none;
 }
 
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-color: var(--accent);
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+.theme-toggle:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+button:focus-visible,
+.pill-link:focus-visible,
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: default;
@@ -226,6 +246,18 @@ button:disabled {
 .evidence {
   display: block;
   overflow-wrap: anywhere;
+}
+
+.app-shell,
+.app-shell *,
+button,
+.pill-link,
+.dropzone,
+.progress-line,
+.progress-line span,
+.detail-item,
+.detail-body {
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 @media (max-width: 760px) {

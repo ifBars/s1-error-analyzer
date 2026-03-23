@@ -7,7 +7,37 @@ import {
   type Diagnosis,
 } from './lib/analyzer'
 
+type ThemeMode = 'light' | 'dark'
+
+const THEME_STORAGE_KEY = 'ea-theme'
+
+function getSystemTheme(): ThemeMode {
+  if (typeof window === 'undefined' || !window.matchMedia) {
+    return 'light'
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function readThemePreference(): ThemeMode | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  try {
+    const raw = window.localStorage.getItem(THEME_STORAGE_KEY)
+    return raw === 'dark' || raw === 'light' ? raw : null
+  } catch {
+    return null
+  }
+}
+
+function getInitialTheme(): ThemeMode {
+  return readThemePreference() ?? getSystemTheme()
+}
+
 function App() {
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme)
   const [fileName, setFileName] = useState('No log loaded')
   const [logText, setLogText] = useState('')
   const [result, setResult] = useState<AnalysisResult | null>(null)
@@ -15,6 +45,15 @@ function App() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [hasDeveloperDocs, setHasDeveloperDocs] = useState(false)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+    } catch {
+      // ignore storage access issues
+    }
+  }, [theme])
 
   useEffect(() => {
     let cancelled = false
@@ -63,6 +102,8 @@ function App() {
   const progressPercent = Math.round(progressValue * 100)
   const baseUrl = import.meta.env.BASE_URL === '/' ? '/' : `${import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`}`
   const developerDocsHref = `${baseUrl}docs/core/`
+  const nextTheme: ThemeMode = theme === 'dark' ? 'light' : 'dark'
+  const themeButtonLabel = theme === 'light' ? '🌙 Dark mode' : '☀️ Light mode'
 
   useEffect(() => {
     if (import.meta.env.DEV) {
@@ -157,6 +198,14 @@ function App() {
           Need integration details for the shared core library? The generated developer docs are published alongside this in-browser analyzer.
         </p>
         <div className="header-links">
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={() => setTheme((current) => (current === 'light' ? 'dark' : 'light'))}
+            aria-label={`Switch to ${nextTheme} mode`}
+          >
+            {themeButtonLabel}
+          </button>
           {hasDeveloperDocs ? (
             <a className="pill-link" href={developerDocsHref}>
               Open core library docs
