@@ -101,7 +101,8 @@ function App() {
   const progressValue = clampProgress(analysisProgress?.progress ?? 0)
   const progressPercent = Math.round(progressValue * 100)
   const baseUrl = import.meta.env.BASE_URL === '/' ? '/' : `${import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`}`
-  const developerDocsHref = `${baseUrl}docs/core/`
+  const developerDocsPath = import.meta.env.VITE_CORE_DOCS_PATH ?? `${baseUrl}docs/core/`
+  const developerDocsHref = normalizePathWithTrailingSlash(developerDocsPath)
   const nextTheme: ThemeMode = theme === 'dark' ? 'light' : 'dark'
   const themeButtonLabel = theme === 'light' ? '🌙 Dark mode' : '☀️ Light mode'
 
@@ -354,6 +355,15 @@ function App() {
 
 function clampProgress(progress: number) {
   return Math.min(Math.max(progress, 0), 1)
+}
+
+function normalizePathWithTrailingSlash(path: string) {
+  const normalized = path.trim()
+  if (!normalized) {
+    return '/'
+  }
+
+  return normalized.endsWith('/') ? normalized : `${normalized}/`
 }
 
 type ActionGroup = {

@@ -45,6 +45,9 @@ jobs:
       - name: Restore .NET workloads
         run: dotnet workload restore src/ErrorAnalyzer.WASM/ErrorAnalyzer.WASM.csproj
 
+      - name: Restore .NET local tools
+        run: dotnet tool restore
+
       - name: Build combined analyzer site and core docs
         run: bun run build:pages:site s1-error-analyzer
 
