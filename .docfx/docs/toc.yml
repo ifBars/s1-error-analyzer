@@ -1,0 +1,8 @@
+- name: Guide overview
+  href: index.md
+- name: Getting started
+  href: getting-started.md
+- name: Analysis pipeline
+  href: analysis-pipeline.md
+- name: Result models
+  href: result-models.md
