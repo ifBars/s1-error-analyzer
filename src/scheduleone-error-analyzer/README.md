@@ -38,7 +38,7 @@ This also republishes the WASM analyzer first and copies the runtime assets into
 
 ## GitHub Pages
 
-The repository's default GitHub Pages deployment now publishes this analyzer at the site root and the generated `ErrorAnalyzer.Core` docs alongside it at `docs/core/` by default. Set `CORE_DOCS_ENDPOINT` to change where the docs are emitted (for example `CORE_DOCS_ENDPOINT=docs/reference`).
+The repository's default GitHub Pages deployment now publishes this analyzer at the site root and the generated `ErrorAnalyzer.Core` docs alongside it at `docs/` by default. Set `CORE_DOCS_ENDPOINT` to change where the docs are emitted (for example `CORE_DOCS_ENDPOINT=docs/reference`).
 
 The app is still ready to build for either:
 
@@ -61,7 +61,7 @@ To build the same combined Pages output used by CI from the repository root, run
 bun run build:pages:site s1-error-analyzer
 ```
 
-That command builds this frontend first and then adds the generated core-library docs under `dist/<docs-endpoint>/`, where `docs-endpoint` is `CORE_DOCS_ENDPOINT` (default `docs/core`).
+That command builds this frontend first and then adds the generated core-library docs under `dist/<docs-endpoint>/`, where `docs-endpoint` is `CORE_DOCS_ENDPOINT` (default `docs`).
 
 Or from this package:
 

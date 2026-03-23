@@ -53,4 +53,4 @@ bun run test:workspace
 
 ## GitHub Pages
 
-The GitHub Pages workflow lives at `.github/workflows/deploy-pages.yml` and publishes both the React analyzer app and generated `ErrorAnalyzer.Core` documentation in one static site. Use `bun run build:pages:site s1-error-analyzer` to build the combined Pages output locally; the analyzer is served from the site root and the generated core docs are emitted at `docs/core/` by default. Set `CORE_DOCS_ENDPOINT` to change the endpoint (for example `CORE_DOCS_ENDPOINT=docs/reference bun run build:pages:site s1-error-analyzer`).
+The GitHub Pages workflow lives at `.github/workflows/deploy-pages.yml` and publishes both the React analyzer app and generated `ErrorAnalyzer.Core` documentation in one static site. Use `bun run build:pages:site s1-error-analyzer` to build the combined Pages output locally; the analyzer is served from the site root and the generated core docs are emitted at `docs/` by default. Set `CORE_DOCS_ENDPOINT` to change the endpoint (for example `CORE_DOCS_ENDPOINT=docs/reference bun run build:pages:site s1-error-analyzer`).

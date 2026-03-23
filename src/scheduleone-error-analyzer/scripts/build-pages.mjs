@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process'
 
 const repoName = process.argv[2] ?? process.env.GITHUB_PAGES_REPO ?? ''
 const basePath = repoName ? `/${repoName.replace(/^\/+|\/+$/g, '')}/` : '/'
-const docsEndpoint = normalizeDocsPath(process.env.CORE_DOCS_ENDPOINT ?? 'docs/core')
+const docsEndpoint = normalizeDocsPath(process.env.CORE_DOCS_ENDPOINT ?? 'docs')
 const docsPublicPath = `${basePath}${docsEndpoint}`.replace(/\/?$/, '/')
 
 run('bun', ['run', 'prebuild'])

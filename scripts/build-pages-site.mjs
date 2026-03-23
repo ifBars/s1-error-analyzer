@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process'
 
 const cli = parseArgs(process.argv.slice(2))
 const repoName = cli.repoName ?? process.env.GITHUB_PAGES_REPO ?? ''
-const docsEndpoint = normalizeDocsPath(cli.docsEndpoint ?? process.env.CORE_DOCS_ENDPOINT ?? 'docs/core')
+const docsEndpoint = normalizeDocsPath(cli.docsEndpoint ?? process.env.CORE_DOCS_ENDPOINT ?? 'docs')
 const basePath = repoName ? `/${repoName.replace(/^\/+|\/+$/g, '')}/` : '/'
 const distDir = path.join(process.cwd(), 'src', 'scheduleone-error-analyzer', 'dist')
 const docsOutputDir = path.join(distDir, docsEndpoint)
