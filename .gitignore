@@ -5,6 +5,9 @@ src/scheduleone-error-analyzer/dist/
 src/scheduleone-error-analyzer/dist-ssr/
 .docfx/templates/material/
 .docfx/tools/
+.docfx/_site/
+.docfx/api/**/*.yml
+.docfx/api/**/*.json
 
 # Dotnet build output
 **/bin/

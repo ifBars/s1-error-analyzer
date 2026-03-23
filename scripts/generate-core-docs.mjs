@@ -21,6 +21,7 @@ if (args.base) {
 ensureDocfxTooling()
 ensureMaterialTheme()
 rmSync(outputDir, { recursive: true, force: true })
+run('dotnet', ['tool', 'run', 'docfx', 'metadata', docfxConfigPath])
 run('dotnet', ['tool', 'run', 'docfx', 'build', docfxConfigPath, '--output', outputDir])
 
 console.log(`[core-docs] Generated DocFX docs at ${path.relative(repoRoot, outputDir)}`)
