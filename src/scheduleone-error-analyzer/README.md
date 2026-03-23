@@ -38,7 +38,9 @@ This also republishes the WASM analyzer first and copies the runtime assets into
 
 ## GitHub Pages
 
-The app is ready to build for either:
+The repository's default GitHub Pages deployment now publishes this analyzer at the site root and the generated `ErrorAnalyzer.Core` docs alongside it at `docs/core/`.
+
+The app is still ready to build for either:
 
 - a user/org site at `/`
 - a project site at `/<repo-name>/`
@@ -52,6 +54,14 @@ From the repository root:
 ```bash
 bun run build:pages ErrorAnalyzer
 ```
+
+To build the same combined Pages output used by CI from the repository root, run:
+
+```bash
+bun run build:pages:site s1-error-analyzer
+```
+
+That command builds this frontend first and then adds the generated core-library docs under `dist/docs/core/`.
 
 Or from this package:
 

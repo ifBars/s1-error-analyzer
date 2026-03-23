@@ -42,8 +42,8 @@ jobs:
       - name: Restore .NET workloads
         run: dotnet workload restore src/ErrorAnalyzer.WASM/ErrorAnalyzer.WASM.csproj
 
-      - name: Build GitHub Pages site
-        run: bun run build:pages s1-error-analyzer
+      - name: Build combined analyzer site and core docs
+        run: bun run build:pages:site s1-error-analyzer
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

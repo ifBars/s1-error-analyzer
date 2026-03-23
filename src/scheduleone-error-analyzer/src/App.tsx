@@ -60,6 +60,7 @@ function App() {
   const modGroups = useMemo(() => groupDiagnosesByMod(result?.diagnoses ?? []), [result])
   const progressValue = clampProgress(analysisProgress?.progress ?? 0)
   const progressPercent = Math.round(progressValue * 100)
+  const developerDocsHref = `${import.meta.env.BASE_URL}docs/core/`
 
   async function handleFileSelect(file: File | null) {
     if (!file) {
@@ -125,6 +126,14 @@ function App() {
       <header className="page-header">
         <p className="eyebrow">Schedule 1 Error Analyzer</p>
         <h1>Drop in `Latest.log` and get the first fix to try.</h1>
+        <p className="hero-copy">
+          Need integration details for the shared core library? The generated developer docs are published alongside this in-browser analyzer.
+        </p>
+        <div className="header-links">
+          <a className="pill-link" href={developerDocsHref}>
+            Open core library docs
+          </a>
+        </div>
       </header>
 
       <section className="section-block">
