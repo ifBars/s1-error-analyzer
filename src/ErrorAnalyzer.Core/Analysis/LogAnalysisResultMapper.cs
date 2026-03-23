@@ -5,7 +5,6 @@ public static class LogAnalysisResultMapper
     public static LogAnalysisResultDto ToDto(LogAnalysisResult result)
     {
         return new LogAnalysisResultDto(
-            result.SourceName,
             result.Runtime.ToString(),
             result.Diagnoses.Select(ToDto).ToArray());
     }

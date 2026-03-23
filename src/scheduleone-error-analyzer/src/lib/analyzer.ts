@@ -25,7 +25,6 @@ export type Diagnosis = {
 }
 
 export type AnalysisResult = {
-  sourceName: string
   runtime: RuntimeKind
   diagnoses: Diagnosis[]
 }
@@ -39,7 +38,7 @@ type AnalyzerExports = {
   ErrorAnalyzer: {
     WASM: {
       AnalyzerExports: {
-        AnalyzeLogAsync: (text: string, sourceName: string) => Promise<string>
+        AnalyzeLogAsync: (text: string) => Promise<string>
         GetVersion: () => string
       }
     }
@@ -61,10 +60,9 @@ const ANALYZER_YIELD_KEY = '__scheduleOneAnalyzerYieldToUi'
 
 export async function analyzeLogAsync(
   text: string,
-  sourceName: string,
   onProgress?: (progress: AnalysisProgress) => void,
 ): Promise<AnalysisResult> {
-  console.info('[ErrorAnalyzer] Starting log analysis for', sourceName)
+  console.info('[ErrorAnalyzer] Starting log analysis')
   onProgress?.({ phase: 'Booting analyzer', progress: 0.28 })
   const exports = await getAnalyzerExports(onProgress)
 
@@ -80,8 +78,8 @@ export async function analyzeLogAsync(
   let json = ''
 
   try {
-    json = await exports.ErrorAnalyzer.WASM.AnalyzerExports.AnalyzeLogAsync(text, sourceName)
-    console.info('[ErrorAnalyzer] WASM analysis completed for', sourceName)
+    json = await exports.ErrorAnalyzer.WASM.AnalyzerExports.AnalyzeLogAsync(text)
+    console.info('[ErrorAnalyzer] WASM analysis completed')
   } finally {
     cleanup()
   }

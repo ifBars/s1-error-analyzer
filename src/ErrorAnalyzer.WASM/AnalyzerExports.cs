@@ -18,9 +18,9 @@ public partial class AnalyzerExports
     internal static partial Task YieldToUi();
 
     [JSExport]
-    public static async Task<string> AnalyzeLogAsync(string text, string sourceName)
+    public static async Task<string> AnalyzeLogAsync(string text)
     {
-        var result = await Analyzer.AnalyzeTextAsDtoAsync(text, sourceName, static progress => TryReportProgressAsync(progress));
+        var result = await Analyzer.AnalyzeTextAsDtoAsync(text, static progress => TryReportProgressAsync(progress));
         return JsonSerializer.Serialize(result, AnalyzerJsonContext.Default.LogAnalysisResultDto);
     }
 

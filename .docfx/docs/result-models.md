@@ -4,7 +4,7 @@ The core library exposes both domain models and DTO models so callers can choose
 
 ## Domain models
 
-- <xref:ErrorAnalyzer.Core.LogAnalysisResult> contains the analyzed source name, detected runtime, and returned diagnoses.
+- <xref:ErrorAnalyzer.Core.LogAnalysisResult> contains the detected runtime and returned diagnoses.
 - <xref:ErrorAnalyzer.Core.Diagnosis> describes one finding, including its rule id, evidence, severity, confidence, and advice payload.
 - <xref:ErrorAnalyzer.Core.AnalysisProgress> reports progress phases while analysis is running.
 

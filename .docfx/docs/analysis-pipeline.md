@@ -4,7 +4,7 @@
 
 ## 1. Parse the document
 
-<xref:ErrorAnalyzer.Core.LogAnalyzer> normalizes the input text into a `LogDocument`, preserving line numbers and source name. During this stage the library also detects the runtime flavor by scanning for Mono and IL2CPP markers in the log.
+<xref:ErrorAnalyzer.Core.LogAnalyzer> normalizes the input text into a `LogDocument`, preserving line numbers. During this stage the library also detects the runtime flavor by scanning for Mono and IL2CPP markers in the log.
 
 ## 2. Run detection rules
 

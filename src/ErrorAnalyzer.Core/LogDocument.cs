@@ -44,9 +44,8 @@ internal sealed class LogDocument
         "System.Private.CoreLib",
     };
 
-    public LogDocument(string sourceName, string text)
+    public LogDocument(string text)
     {
-        SourceName = sourceName;
         Text = text;
         Lines = text
             .Replace("\r\n", "\n")
@@ -55,8 +54,6 @@ internal sealed class LogDocument
             .ToArray();
         Runtime = DetectRuntime(Lines);
     }
-
-    public string SourceName { get; }
 
     public string Text { get; }
 

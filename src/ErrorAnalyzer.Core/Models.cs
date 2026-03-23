@@ -184,18 +184,14 @@ public sealed class LogAnalysisResult
 {
     public LogAnalysisResult()
     {
-        SourceName = string.Empty;
         Diagnoses = Array.Empty<Diagnosis>();
     }
 
-    public LogAnalysisResult(string sourceName, RuntimeKind runtime, IReadOnlyList<Diagnosis> diagnoses)
+    public LogAnalysisResult(RuntimeKind runtime, IReadOnlyList<Diagnosis> diagnoses)
     {
-        SourceName = sourceName;
         Runtime = runtime;
         Diagnoses = diagnoses;
     }
-
-    public string SourceName { get; set; }
 
     public RuntimeKind Runtime { get; set; }
 
@@ -296,19 +292,15 @@ public sealed class LogAnalysisResultDto
 {
     public LogAnalysisResultDto()
     {
-        SourceName = string.Empty;
         Runtime = string.Empty;
         Diagnoses = Array.Empty<DiagnosisDto>();
     }
 
-    public LogAnalysisResultDto(string sourceName, string runtime, IReadOnlyList<DiagnosisDto> diagnoses)
+    public LogAnalysisResultDto(string runtime, IReadOnlyList<DiagnosisDto> diagnoses)
     {
-        SourceName = sourceName;
         Runtime = runtime;
         Diagnoses = diagnoses;
     }
-
-    public string SourceName { get; set; }
 
     public string Runtime { get; set; }
 

@@ -60,7 +60,7 @@ public sealed class DiagnosisAdviceTests
                 "Move this file from Plugins into Mods, then try again.",
                 "MelonLoader recognized this file as a mod, not a plugin."));
 
-        var dto = LogAnalysisResultMapper.ToDto(new LogAnalysisResult("sample.log", RuntimeKind.Il2Cpp, new[] { diagnosis }));
+        var dto = LogAnalysisResultMapper.ToDto(new LogAnalysisResult(RuntimeKind.Il2Cpp, new[] { diagnosis }));
         var dtoDiagnosis = Assert.Single(dto.Diagnoses);
 
         Assert.Equal("mod_in_wrong_folder", dtoDiagnosis.Advice.GroupKey);

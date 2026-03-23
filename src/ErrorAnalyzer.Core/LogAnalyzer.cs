@@ -40,10 +40,10 @@ public sealed class LogAnalyzer
     /// <summary>
     /// Analyzes raw log text and returns the normalized result.
     /// </summary>
-    public LogAnalysisResult AnalyzeText(string text, string sourceName, Action<AnalysisProgress>? reportProgress = null)
+    public LogAnalysisResult AnalyzeText(string text, Action<AnalysisProgress>? reportProgress = null)
     {
         reportProgress?.Invoke(new AnalysisProgress("Parsing log", 0.05));
-        var document = new LogDocument(sourceName, text);
+        var document = new LogDocument(text);
         reportProgress?.Invoke(new AnalysisProgress("Checking runtime markers", 0.14));
 
         var diagnoses = new List<Diagnosis>();
@@ -58,42 +58,41 @@ public sealed class LogAnalyzer
         var aggregatedDiagnoses = _aggregator.Aggregate(diagnoses);
         reportProgress?.Invoke(new AnalysisProgress("Finalizing report", 0.98));
 
-        return new LogAnalysisResult(sourceName, document.Runtime, aggregatedDiagnoses);
+        return new LogAnalysisResult(document.Runtime, aggregatedDiagnoses);
     }
 
     /// <summary>
     /// Reads and analyzes a log file from disk.
     /// </summary>
     public LogAnalysisResult AnalyzeFile(string path)
-        => AnalyzeText(File.ReadAllText(path), Path.GetFileName(path));
+        => AnalyzeText(File.ReadAllText(path));
 
     /// <summary>
     /// Analyzes raw log text and converts the result into the DTO shape.
     /// </summary>
-    public LogAnalysisResultDto AnalyzeTextAsDto(string text, string sourceName)
-        => LogAnalysisResultMapper.ToDto(AnalyzeText(text, sourceName));
+    public LogAnalysisResultDto AnalyzeTextAsDto(string text)
+        => LogAnalysisResultMapper.ToDto(AnalyzeText(text));
 
     /// <summary>
     /// Analyzes raw log text, reports progress, and converts the result into the DTO shape.
     /// </summary>
-    public LogAnalysisResultDto AnalyzeTextAsDto(string text, string sourceName, Action<AnalysisProgress>? reportProgress)
-        => LogAnalysisResultMapper.ToDto(AnalyzeText(text, sourceName, reportProgress));
+    public LogAnalysisResultDto AnalyzeTextAsDto(string text, Action<AnalysisProgress>? reportProgress)
+        => LogAnalysisResultMapper.ToDto(AnalyzeText(text, reportProgress));
 
     /// <summary>
     /// Asynchronously analyzes raw log text and reports progress to asynchronous callers.
     /// </summary>
     public async Task<LogAnalysisResultDto> AnalyzeTextAsDtoAsync(
         string text,
-        string sourceName,
         Func<AnalysisProgress, Task>? reportProgress)
     {
         if (reportProgress is null)
         {
-            return AnalyzeTextAsDto(text, sourceName);
+            return AnalyzeTextAsDto(text);
         }
 
         await reportProgress(new AnalysisProgress("Parsing log", 0.05));
-        var document = new LogDocument(sourceName, text);
+        var document = new LogDocument(text);
         await reportProgress(new AnalysisProgress("Checking runtime markers", 0.14));
 
         var diagnoses = new List<Diagnosis>();
@@ -108,7 +107,7 @@ public sealed class LogAnalyzer
         var aggregatedDiagnoses = _aggregator.Aggregate(diagnoses);
         await reportProgress(new AnalysisProgress("Finalizing report", 0.98));
 
-        return LogAnalysisResultMapper.ToDto(new LogAnalysisResult(sourceName, document.Runtime, aggregatedDiagnoses));
+        return LogAnalysisResultMapper.ToDto(new LogAnalysisResult(document.Runtime, aggregatedDiagnoses));
     }
 
     /// <summary>

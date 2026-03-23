@@ -84,7 +84,7 @@ public sealed class LogAnalyzerTests
         Assert.Contains(lines, line => line.Contains("CartelEnforcer.dll", StringComparison.Ordinal));
 
         var logText = string.Join(Environment.NewLine, lines);
-        var document = new LogDocument("Latest (22).log", logText);
+        var document = new LogDocument(logText);
         var conflicts = RuntimeVariantDetector.FindConflicts(document);
 
         Assert.Contains(conflicts, x =>

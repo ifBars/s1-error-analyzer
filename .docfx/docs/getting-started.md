@@ -8,7 +8,7 @@ The main entry point is <xref:ErrorAnalyzer.Core.LogAnalyzer>. It can analyze ra
 using ErrorAnalyzer.Core;
 
 var analyzer = new LogAnalyzer();
-var result = analyzer.AnalyzeText(logText, "Player.log");
+var result = analyzer.AnalyzeText(logText);
 
 foreach (var diagnosis in result.Diagnoses)
 {
@@ -25,17 +25,16 @@ var analyzer = new LogAnalyzer();
 
 var result = analyzer.AnalyzeText(
     logText,
-    "Player.log",
     progress => Console.WriteLine($"{progress.Phase} ({progress.Progress:P0})"));
 ```
 
 ## Use DTO output
 
-If your caller needs string-backed enums and a serialization-friendly shape, use <xref:ErrorAnalyzer.Core.LogAnalyzer.AnalyzeTextAsDto(System.String,System.String)> or <xref:ErrorAnalyzer.Core.LogAnalyzer.AnalyzeFileAsDto(System.String)>.
+If your caller needs string-backed enums and a serialization-friendly shape, use <xref:ErrorAnalyzer.Core.LogAnalyzer.AnalyzeTextAsDto(System.String)> or <xref:ErrorAnalyzer.Core.LogAnalyzer.AnalyzeFileAsDto(System.String)>.
 
 ```csharp
 var analyzer = new LogAnalyzer();
-var dto = analyzer.AnalyzeTextAsDto(logText, "Player.log");
+var dto = analyzer.AnalyzeTextAsDto(logText);
 
 Console.WriteLine(dto.Runtime);
 Console.WriteLine(dto.Diagnoses.Count);

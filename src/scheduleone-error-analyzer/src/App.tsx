@@ -64,7 +64,7 @@ function App() {
       }
     }
 
-    void analyzeLogAsync(logText, fileName, (progress) => {
+    void analyzeLogAsync(logText, (progress) => {
       if (!cancelled) {
         setAnalysisProgress(progress)
       }
