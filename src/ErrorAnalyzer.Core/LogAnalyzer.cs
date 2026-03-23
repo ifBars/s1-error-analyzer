@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using ErrorAnalyzer.Core.Analysis;
+using ErrorAnalyzer.Core.Rules;
 
 namespace ErrorAnalyzer.Core;
 

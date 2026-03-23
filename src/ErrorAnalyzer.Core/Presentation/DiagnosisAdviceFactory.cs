@@ -1,4 +1,4 @@
-namespace ErrorAnalyzer.Core;
+namespace ErrorAnalyzer.Core.Presentation;
 
 /// <summary>
 /// Creates standardized advice payloads for diagnoses.

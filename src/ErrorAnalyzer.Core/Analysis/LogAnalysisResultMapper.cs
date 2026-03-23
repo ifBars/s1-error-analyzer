@@ -1,4 +1,4 @@
-namespace ErrorAnalyzer.Core;
+namespace ErrorAnalyzer.Core.Analysis;
 
 public static class LogAnalysisResultMapper
 {

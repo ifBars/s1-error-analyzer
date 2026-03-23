@@ -1,4 +1,4 @@
-namespace ErrorAnalyzer.Core;
+namespace ErrorAnalyzer.Core.Analysis;
 
 internal sealed class DiagnosisAggregator
 {
@@ -16,8 +16,8 @@ internal sealed class DiagnosisAggregator
             }
 
             var earliestDiagnosis = diagnosis.LineNumber < existing.LineNumber
-                ? diagnosis with { OccurrenceCount = existing.OccurrenceCount + 1 }
-                : existing with { OccurrenceCount = existing.OccurrenceCount + 1 };
+                ? CloneWithOccurrenceCount(diagnosis, existing.OccurrenceCount + 1)
+                : CloneWithOccurrenceCount(existing, existing.OccurrenceCount + 1);
             aggregated[key] = earliestDiagnosis;
         }
 
@@ -31,6 +31,22 @@ internal sealed class DiagnosisAggregator
 
     private static string BuildAggregateKey(Diagnosis diagnosis)
         => $"{diagnosis.RuleId}|{diagnosis.ModName}|{NormalizeEvidence(diagnosis.Evidence)}";
+
+    private static Diagnosis CloneWithOccurrenceCount(Diagnosis diagnosis, int occurrenceCount)
+    {
+        return new Diagnosis(
+            diagnosis.RuleId,
+            diagnosis.Title,
+            diagnosis.Message,
+            diagnosis.SuggestedAction,
+            diagnosis.ModName,
+            diagnosis.Evidence,
+            diagnosis.LineNumber,
+            diagnosis.Severity,
+            diagnosis.Confidence,
+            diagnosis.Advice,
+            occurrenceCount);
+    }
 
     private static string NormalizeEvidence(string evidence)
     {

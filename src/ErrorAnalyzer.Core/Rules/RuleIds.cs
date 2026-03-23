@@ -1,4 +1,4 @@
-namespace ErrorAnalyzer.Core;
+namespace ErrorAnalyzer.Core.Rules;
 
 /// <summary>
 /// Stable identifiers emitted by the built-in detection rules.

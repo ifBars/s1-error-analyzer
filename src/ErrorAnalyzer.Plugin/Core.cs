@@ -1,4 +1,5 @@
 using ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Presentation;
 using MelonLoader;
 using MelonLoader.Utils;
 

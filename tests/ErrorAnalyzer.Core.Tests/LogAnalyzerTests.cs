@@ -1,4 +1,5 @@
 using ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Rules;
 using Xunit;
 
 namespace ErrorAnalyzer.Core.Tests;

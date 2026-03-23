@@ -1,5 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
+using ErrorAnalyzer.Core.Presentation;
+
+#pragma warning disable CS1591
 
 namespace ErrorAnalyzer.Core;
 
@@ -69,19 +72,67 @@ public enum DiagnosisConfidence
 /// <summary>
 /// Represents a single diagnosis found while analyzing a log.
 /// </summary>
-public sealed record Diagnosis(
-    string RuleId,
-    string Title,
-    string Message,
-    string SuggestedAction,
-    string? ModName,
-    string Evidence,
-    int LineNumber,
-    DiagnosisSeverity Severity,
-    DiagnosisConfidence Confidence,
-    DiagnosisAdvice Advice,
-    int OccurrenceCount = 1)
+public sealed class Diagnosis
 {
+    public Diagnosis()
+    {
+        RuleId = string.Empty;
+        Title = string.Empty;
+        Message = string.Empty;
+        SuggestedAction = string.Empty;
+        Evidence = string.Empty;
+        Advice = new DiagnosisAdvice();
+        OccurrenceCount = 1;
+    }
+
+    public Diagnosis(
+        string ruleId,
+        string title,
+        string message,
+        string suggestedAction,
+        string? modName,
+        string evidence,
+        int lineNumber,
+        DiagnosisSeverity severity,
+        DiagnosisConfidence confidence,
+        DiagnosisAdvice advice,
+        int occurrenceCount = 1)
+    {
+        RuleId = ruleId;
+        Title = title;
+        Message = message;
+        SuggestedAction = suggestedAction;
+        ModName = modName;
+        Evidence = evidence;
+        LineNumber = lineNumber;
+        Severity = severity;
+        Confidence = confidence;
+        Advice = advice;
+        OccurrenceCount = occurrenceCount;
+    }
+
+    public string RuleId { get; set; }
+
+    public string Title { get; set; }
+
+    public string Message { get; set; }
+
+    public string SuggestedAction { get; set; }
+
+    public string? ModName { get; set; }
+
+    public string Evidence { get; set; }
+
+    public int LineNumber { get; set; }
+
+    public DiagnosisSeverity Severity { get; set; }
+
+    public DiagnosisConfidence Confidence { get; set; }
+
+    public DiagnosisAdvice Advice { get; set; }
+
+    public int OccurrenceCount { get; set; }
+
     /// <summary>
     /// Gets a stable identifier for deduplicating repeated findings.
     /// </summary>
@@ -111,17 +162,17 @@ public sealed record Diagnosis(
         DiagnosisConfidence confidence,
         int occurrenceCount = 1)
         : this(
-            ruleId,
-            title,
-            message,
-            suggestedAction,
-            modName,
-            evidence,
-            lineNumber,
-            severity,
-            confidence,
-            DiagnosisAdviceFactory.Generic(ruleId, title, message, suggestedAction),
-            occurrenceCount)
+              ruleId,
+              title,
+              message,
+              suggestedAction,
+              modName,
+              evidence,
+              lineNumber,
+              severity,
+              confidence,
+              DiagnosisAdviceFactory.Generic(ruleId, title, message, suggestedAction),
+              occurrenceCount)
     {
     }
 }
@@ -129,38 +180,139 @@ public sealed record Diagnosis(
 /// <summary>
 /// Contains the completed analysis result for a single log source.
 /// </summary>
-public sealed record LogAnalysisResult(
-    string SourceName,
-    RuntimeKind Runtime,
-    IReadOnlyList<Diagnosis> Diagnoses);
+public sealed class LogAnalysisResult
+{
+    public LogAnalysisResult()
+    {
+        SourceName = string.Empty;
+        Diagnoses = Array.Empty<Diagnosis>();
+    }
+
+    public LogAnalysisResult(string sourceName, RuntimeKind runtime, IReadOnlyList<Diagnosis> diagnoses)
+    {
+        SourceName = sourceName;
+        Runtime = runtime;
+        Diagnoses = diagnoses;
+    }
+
+    public string SourceName { get; set; }
+
+    public RuntimeKind Runtime { get; set; }
+
+    public IReadOnlyList<Diagnosis> Diagnoses { get; set; }
+}
 
 /// <summary>
 /// Reports incremental progress while analysis is running.
 /// </summary>
-public sealed record AnalysisProgress(
-    string Phase,
-    double Progress);
+public sealed class AnalysisProgress
+{
+    public AnalysisProgress()
+    {
+        Phase = string.Empty;
+    }
+
+    public AnalysisProgress(string phase, double progress)
+    {
+        Phase = phase;
+        Progress = progress;
+    }
+
+    public string Phase { get; set; }
+
+    public double Progress { get; set; }
+}
 
 /// <summary>
 /// Serializable diagnosis shape for API and browser consumers.
 /// </summary>
-public sealed record DiagnosisDto(
-    string RuleId,
-    string Title,
-    string Message,
-    string SuggestedAction,
-    string? ModName,
-    string Evidence,
-    int LineNumber,
-    string Severity,
-    string Confidence,
-    int OccurrenceCount,
-    DiagnosisAdvice Advice);
+public sealed class DiagnosisDto
+{
+    public DiagnosisDto()
+    {
+        RuleId = string.Empty;
+        Title = string.Empty;
+        Message = string.Empty;
+        SuggestedAction = string.Empty;
+        Evidence = string.Empty;
+        Severity = string.Empty;
+        Confidence = string.Empty;
+        Advice = new DiagnosisAdvice();
+    }
+
+    public DiagnosisDto(
+        string ruleId,
+        string title,
+        string message,
+        string suggestedAction,
+        string? modName,
+        string evidence,
+        int lineNumber,
+        string severity,
+        string confidence,
+        int occurrenceCount,
+        DiagnosisAdvice advice)
+    {
+        RuleId = ruleId;
+        Title = title;
+        Message = message;
+        SuggestedAction = suggestedAction;
+        ModName = modName;
+        Evidence = evidence;
+        LineNumber = lineNumber;
+        Severity = severity;
+        Confidence = confidence;
+        OccurrenceCount = occurrenceCount;
+        Advice = advice;
+    }
+
+    public string RuleId { get; set; }
+
+    public string Title { get; set; }
+
+    public string Message { get; set; }
+
+    public string SuggestedAction { get; set; }
+
+    public string? ModName { get; set; }
+
+    public string Evidence { get; set; }
+
+    public int LineNumber { get; set; }
+
+    public string Severity { get; set; }
+
+    public string Confidence { get; set; }
+
+    public int OccurrenceCount { get; set; }
+
+    public DiagnosisAdvice Advice { get; set; }
+}
 
 /// <summary>
 /// Serializable log analysis result for API and browser consumers.
 /// </summary>
-public sealed record LogAnalysisResultDto(
-    string SourceName,
-    string Runtime,
-    IReadOnlyList<DiagnosisDto> Diagnoses);
+public sealed class LogAnalysisResultDto
+{
+    public LogAnalysisResultDto()
+    {
+        SourceName = string.Empty;
+        Runtime = string.Empty;
+        Diagnoses = Array.Empty<DiagnosisDto>();
+    }
+
+    public LogAnalysisResultDto(string sourceName, string runtime, IReadOnlyList<DiagnosisDto> diagnoses)
+    {
+        SourceName = sourceName;
+        Runtime = runtime;
+        Diagnoses = diagnoses;
+    }
+
+    public string SourceName { get; set; }
+
+    public string Runtime { get; set; }
+
+    public IReadOnlyList<DiagnosisDto> Diagnoses { get; set; }
+}
+
+#pragma warning restore CS1591

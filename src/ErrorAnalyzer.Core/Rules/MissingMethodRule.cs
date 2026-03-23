@@ -1,4 +1,6 @@
-namespace ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Presentation;
+
+namespace ErrorAnalyzer.Core.Rules;
 
 internal sealed class MissingMethodRule : IDetectionRule
 {

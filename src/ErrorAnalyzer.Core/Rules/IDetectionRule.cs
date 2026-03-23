@@ -1,4 +1,4 @@
-namespace ErrorAnalyzer.Core;
+namespace ErrorAnalyzer.Core.Rules;
 
 internal interface IDetectionRule
 {

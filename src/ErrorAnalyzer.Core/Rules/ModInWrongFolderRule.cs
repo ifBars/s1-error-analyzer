@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using ErrorAnalyzer.Core.Presentation;
 
-namespace ErrorAnalyzer.Core;
+namespace ErrorAnalyzer.Core.Rules;
 
 internal sealed class ModInWrongFolderRule : IDetectionRule
 {
