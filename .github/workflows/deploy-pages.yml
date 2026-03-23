@@ -36,6 +36,9 @@ jobs:
       - name: Install frontend dependencies
         run: bun install --frozen-lockfile
 
+      - name: Install WASM workload
+        run: dotnet workload install wasm-tools
+
       - name: Restore .NET solution
         run: dotnet restore ErrorAnalyzer.sln
 
