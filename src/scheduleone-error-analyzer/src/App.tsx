@@ -4,6 +4,7 @@ import {
   analyzeLogAsync,
   type AnalysisProgress,
   type AnalysisResult,
+  type DiagnosisAdviceGroup,
   type Diagnosis,
 } from './lib/analyzer'
 
@@ -96,7 +97,7 @@ function App() {
     }
   }, [fileName, logText])
 
-  const actionCards = useMemo(() => buildActionGroups(result?.diagnoses ?? []), [result])
+  const actionCards = useMemo(() => buildActionGroups(result), [result])
   const modGroups = useMemo(() => groupDiagnosesByMod(result?.diagnoses ?? []), [result])
   const progressValue = clampProgress(analysisProgress?.progress ?? 0)
   const progressPercent = Math.round(progressValue * 100)
@@ -384,36 +385,19 @@ type DetailSummary = {
   hiddenEvidenceCount: number
 }
 
-function buildActionGroups(diagnoses: Diagnosis[]): ActionGroup[] {
-  const groups = new Map<string, ActionGroup>()
-
-  for (const [modName, modDiagnoses] of groupDiagnosesByMod(diagnoses)) {
-    const primary = choosePrimaryDiagnosis(modDiagnoses)
-    const entry = getFriendlyActionGroup(primary, modName)
-    const existing = groups.get(entry.key)
-
-    if (existing) {
-      if (!existing.mods.includes(modName)) {
-        existing.mods.push(modName)
-      }
-      continue
-    }
-
-    groups.set(entry.key, entry)
-  }
-
-  return [...groups.values()].sort((left, right) => left.priority - right.priority)
+function buildActionGroups(result: AnalysisResult | null): ActionGroup[] {
+  return (result?.adviceGroups ?? []).map(getFriendlyActionGroup)
 }
 
-function getFriendlyActionGroup(diagnosis: Diagnosis, modName: string): ActionGroup {
+function getFriendlyActionGroup(group: DiagnosisAdviceGroup): ActionGroup {
   return {
-    key: diagnosis.advice.groupKey,
-    priority: diagnosis.advice.priority,
-    urgency: diagnosis.advice.urgency,
-    title: diagnosis.advice.title,
-    primaryAction: diagnosis.advice.primaryAction,
-    explanation: diagnosis.advice.explanation,
-    mods: [modName],
+    key: group.groupKey,
+    priority: group.priority,
+    urgency: group.urgency,
+    title: group.title,
+    primaryAction: group.primaryAction,
+    explanation: group.explanation,
+    mods: group.affectedMods,
   }
 }
 

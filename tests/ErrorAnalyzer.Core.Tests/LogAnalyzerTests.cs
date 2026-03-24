@@ -1,5 +1,7 @@
 using ErrorAnalyzer.Core;
+using ErrorAnalyzer.Core.Analysis;
 using ErrorAnalyzer.Core.Models;
+using ErrorAnalyzer.Core.Presentation;
 using ErrorAnalyzer.Core.Parsing;
 using ErrorAnalyzer.Core.Runtime;
 using ErrorAnalyzer.Core.Rules;
@@ -43,9 +45,19 @@ public sealed class LogAnalyzerTests
             x.SuggestedAction.Contains("Remove `CartelEnforcer.dll`", StringComparison.Ordinal) &&
             x.SuggestedAction.Contains("keep `CartelEnforcer-IL2Cpp.dll`", StringComparison.Ordinal));
 
+        Assert.DoesNotContain(result.Diagnoses, x =>
+            x.RuleId == RuleIds.RuntimeMismatchMonoModOnIl2Cpp &&
+            string.Equals(x.ModName, "CartelEnforcer", StringComparison.Ordinal));
+
         Assert.Contains(result.Diagnoses, x =>
             x.RuleId == RuleIds.RuntimeMismatchMonoModOnIl2Cpp &&
-            string.Equals(x.ModName, "RainsCarMod", StringComparison.Ordinal));
+            string.Equals(x.ModName, "RainsCarMod", StringComparison.Ordinal) &&
+            x.Evidence.Contains("FishNet.Runtime", StringComparison.Ordinal));
+
+        Assert.DoesNotContain(result.Diagnoses, x =>
+            x.RuleId == RuleIds.MissingDependency &&
+            string.Equals(x.ModName, "RainsCarMod", StringComparison.Ordinal) &&
+            x.Evidence.Contains("FishNet.Runtime", StringComparison.Ordinal));
 
         Assert.Contains(result.Diagnoses, x =>
             x.RuleId == RuleIds.MissingDependency &&
@@ -101,7 +113,7 @@ public sealed class LogAnalyzerTests
     {
         var result = Analyze("Latest (22).log");
 
-        Assert.Contains(result.Diagnoses, x =>
+        Assert.DoesNotContain(result.Diagnoses, x =>
             (x.RuleId == RuleIds.OutdatedTypeReference ||
              x.RuleId == RuleIds.RuntimeMismatchMonoModOnIl2Cpp) &&
             string.Equals(x.ModName, "CartelEnforcer", StringComparison.Ordinal) &&
@@ -171,11 +183,63 @@ public sealed class LogAnalyzerTests
 
         Assert.Contains(result.Diagnoses, x =>
             x.RuleId == RuleIds.MissingMethod &&
-            string.Equals(x.ModName, "Low_End", StringComparison.Ordinal) &&
+            string.Equals(x.ModName, "Low End", StringComparison.Ordinal) &&
             x.Evidence.Contains("Resources.FindObjectsOfTypeAll", StringComparison.Ordinal));
 
         Assert.DoesNotContain(result.Diagnoses, x =>
             string.Equals(x.ModName, "Class1", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void TreatsUnderscoresAndSpacesAsTheSameModWhenResolvingNearbyOwner()
+    {
+        const string logText = """
+                               [12:00:00] [Property Price Manager] Applying patches
+                               System.MissingMethodException: Method not found: 'System.String ScheduleOne.Test::Broken()'
+                                 at Property_Price_Manager.Patches.Example.Apply()
+                               """;
+
+        var result = _analyzer.AnalyzeText(logText);
+
+        var diagnosis = Assert.Single(result.Diagnoses, x => x.RuleId == RuleIds.MissingMethod);
+        Assert.Equal("Property Price Manager", diagnosis.ModName);
+    }
+
+    [Fact]
+    public void AggregatesEquivalentModNamesWhenOnlySpacingDiffers()
+    {
+        var aggregator = new DiagnosisAggregator();
+        var advice = DiagnosisAdviceFactory.OutdatedMod();
+        var diagnoses = new[]
+        {
+            new Diagnosis(
+                RuleIds.MissingMethod,
+                "This mod is outdated",
+                "This mod is looking for game code that is no longer there after an update.",
+                "Update this mod if there is a newer version. If not, remove it for now.",
+                "Property_Price_Manager",
+                "System.MissingMethodException: Method not found: 'System.String ScheduleOne.Test::Broken()'",
+                10,
+                DiagnosisSeverity.Error,
+                DiagnosisConfidence.High,
+                advice),
+            new Diagnosis(
+                RuleIds.MissingMethod,
+                "This mod is outdated",
+                "This mod is looking for game code that is no longer there after an update.",
+                "Update this mod if there is a newer version. If not, remove it for now.",
+                "Property Price Manager",
+                "System.MissingMethodException: Method not found: 'System.String ScheduleOne.Test::Broken()'",
+                12,
+                DiagnosisSeverity.Error,
+                DiagnosisConfidence.High,
+                advice),
+        };
+
+        var aggregated = aggregator.Aggregate(diagnoses);
+
+        var diagnosis = Assert.Single(aggregated);
+        Assert.Equal(2, diagnosis.OccurrenceCount);
     }
 
     private LogAnalysisResult Analyze(string fileName)

@@ -8,7 +8,8 @@ public static class LogAnalysisResultMapper
     {
         return new LogAnalysisResultDto(
             result.Runtime.ToString(),
-            result.Diagnoses.Select(ToDto).ToArray());
+            result.Diagnoses.Select(ToDto).ToArray(),
+            DiagnosisAdviceGroupBuilder.Build(result.Diagnoses));
     }
 
     private static DiagnosisDto ToDto(Diagnosis diagnosis)

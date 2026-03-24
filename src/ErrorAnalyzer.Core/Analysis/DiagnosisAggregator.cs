@@ -32,7 +32,7 @@ internal sealed class DiagnosisAggregator
     }
 
     private static string BuildAggregateKey(Diagnosis diagnosis)
-        => $"{diagnosis.RuleId}|{diagnosis.ModName}|{NormalizeEvidence(diagnosis.Evidence)}";
+        => $"{diagnosis.RuleId}|{ModNameNormalizer.GetEquivalenceKey(diagnosis.ModName)}|{NormalizeEvidence(diagnosis.Evidence)}";
 
     private static Diagnosis CloneWithOccurrenceCount(Diagnosis diagnosis, int occurrenceCount)
     {

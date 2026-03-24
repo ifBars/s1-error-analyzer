@@ -10,6 +10,18 @@ export type DiagnosisAdvice = {
   explanation: string
 }
 
+export type DiagnosisAdviceGroup = {
+  groupKey: string
+  priority: number
+  urgency: string
+  title: string
+  primaryAction: string
+  explanation: string
+  affectedMods: string[]
+  diagnosisCount: number
+  totalOccurrences: number
+}
+
 export type Diagnosis = {
   ruleId: string
   title: string
@@ -27,6 +39,7 @@ export type Diagnosis = {
 export type AnalysisResult = {
   runtime: RuntimeKind
   diagnoses: Diagnosis[]
+  adviceGroups: DiagnosisAdviceGroup[]
 }
 
 export type AnalysisProgress = {

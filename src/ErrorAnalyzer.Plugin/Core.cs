@@ -160,13 +160,20 @@ public sealed class ErrorAnalyzerMelon : MelonMod
     {
         var cards = new List<UserAdviceCard>();
 
-        foreach (var group in diagnoses.GroupBy(diagnosis => diagnosis.ModName ?? "Unknown mod", StringComparer.OrdinalIgnoreCase))
+        foreach (var group in diagnoses.GroupBy(diagnosis => diagnosis.Advice.GroupKey, StringComparer.OrdinalIgnoreCase))
         {
             var primaryDiagnosis = group
                 .OrderBy(diagnosis => diagnosis.Advice.Priority)
+                .ThenBy(diagnosis => diagnosis.LineNumber)
                 .First();
 
-            cards.Add(CreateAdviceCard(primaryDiagnosis));
+            var card = CreateAdviceCard(primaryDiagnosis);
+            foreach (var diagnosis in group)
+            {
+                card.AddMod(diagnosis.ModName);
+            }
+
+            cards.Add(card);
         }
 
         return cards
@@ -266,6 +273,7 @@ internal sealed class UserAdviceCard
         if (!ModNames.Any(existing => string.Equals(existing, name, StringComparison.OrdinalIgnoreCase)))
         {
             ModNames.Add(name);
+            ModNames.Sort(StringComparer.OrdinalIgnoreCase);
         }
     }
 }

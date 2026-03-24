@@ -12,6 +12,7 @@ The core library exposes both domain models and DTO models so callers can choose
 
 - <xref:ErrorAnalyzer.Core.LogAnalysisResultDto> mirrors the result shape with string values for runtime, severity, and confidence.
 - <xref:ErrorAnalyzer.Core.DiagnosisDto> is the serialized form of a diagnosis for browser, API, or bot consumers.
+- <xref:ErrorAnalyzer.Core.DiagnosisAdviceGroupDto> summarizes shared advice into render-ready groups such as one "outdated mods" section with all affected mod names.
 
 ## Advice payloads
 

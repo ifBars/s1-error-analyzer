@@ -27,6 +27,23 @@ public sealed class DiagnosisAdviceTests
     }
 
     [Fact]
+    public void FishNetMonoDependencyOnIl2CppUsesRuntimeMismatchAdvice()
+    {
+        var result = Analyze("Latest (22).log");
+        var diagnosis = result.Diagnoses.First(x =>
+            x.RuleId == RuleIds.RuntimeMismatchMonoModOnIl2Cpp &&
+            string.Equals(x.ModName, "RainsCarMod", StringComparison.Ordinal) &&
+            x.Evidence.Contains("FishNet.Runtime", StringComparison.Ordinal));
+        var advice = diagnosis.Advice;
+
+        Assert.Equal(RuleIds.RuntimeMismatchMonoModOnIl2Cpp, advice.GroupKey);
+        Assert.Equal(2, advice.Priority);
+        Assert.Equal("You have the wrong version of a mod installed", advice.Title);
+        Assert.Contains("Il2Cpp", diagnosis.SuggestedAction, StringComparison.Ordinal);
+        Assert.Contains("Il2CppFishNet.Runtime", diagnosis.SuggestedAction, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void OutdatedRuleProvidesSharedAdviceGroup()
     {
         var result = Analyze("Latest (22).log");
@@ -67,6 +84,47 @@ public sealed class DiagnosisAdviceTests
         Assert.Equal("mod_in_wrong_folder", dtoDiagnosis.Advice.GroupKey);
         Assert.Equal(1, dtoDiagnosis.Advice.Priority);
         Assert.Equal("A mod was installed into the wrong folder", dtoDiagnosis.Advice.Title);
+    }
+
+    [Fact]
+    public void ResultDtoIncludesGroupedAdviceSummaries()
+    {
+        var result = Analyze("new.log");
+
+        var dto = LogAnalysisResultMapper.ToDto(result);
+        var outdatedGroup = Assert.Single(dto.AdviceGroups, group => group.GroupKey == "outdated_mods");
+
+        Assert.Equal("One or more mods are outdated after a game update", outdatedGroup.Title);
+        Assert.Contains("AdvancedDealing", outdatedGroup.AffectedMods, StringComparer.Ordinal);
+        Assert.Contains("ContractCompassMarkersPatch", outdatedGroup.AffectedMods, StringComparer.Ordinal);
+        Assert.Contains("Low End", outdatedGroup.AffectedMods, StringComparer.Ordinal);
+        Assert.True(outdatedGroup.AffectedMods.Count >= 4);
+        Assert.True(outdatedGroup.TotalOccurrences >= outdatedGroup.DiagnosisCount);
+    }
+
+    [Fact]
+    public void ResultDtoSkipsUnknownModsInAdviceGroups()
+    {
+        var diagnosis = new Diagnosis(
+            RuleIds.MissingDependency,
+            "A required support file is missing",
+            "This mod could not load one of the files it needs: `Some.Dependency`.",
+            "Reinstall the mod and its required dependencies.",
+            null,
+            "Missing dependency `Some.Dependency`.",
+            42,
+            DiagnosisSeverity.Error,
+            DiagnosisConfidence.High,
+            DiagnosisAdviceFactory.Generic(
+                "missing_dependency:generic",
+                "A mod is missing a required file",
+                "The mod cannot start because one of its required files is not present.",
+                "Reinstall this mod and any required support mods."));
+
+        var dto = LogAnalysisResultMapper.ToDto(new LogAnalysisResult(RuntimeKind.Unknown, new[] { diagnosis }));
+        var group = Assert.Single(dto.AdviceGroups);
+
+        Assert.Empty(group.AffectedMods);
     }
 
     private LogAnalysisResult Analyze(string fileName)

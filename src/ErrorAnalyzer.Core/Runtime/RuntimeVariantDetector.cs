@@ -1,9 +1,17 @@
+using ErrorAnalyzer.Core.Models;
 using ErrorAnalyzer.Core.Parsing;
 
 namespace ErrorAnalyzer.Core.Runtime;
 
 internal static class RuntimeVariantDetector
 {
+    public static HashSet<string> FindConflictModKeys(LogDocument document)
+    {
+        return FindConflicts(document)
+            .Select(conflict => ModNameNormalizer.GetEquivalenceKey(conflict.BaseName))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
     public static IReadOnlyList<RuntimeVariantConflict> FindConflicts(LogDocument document)
     {
         var variantsByBaseName = new Dictionary<string, RuntimeVariantState>(StringComparer.OrdinalIgnoreCase);

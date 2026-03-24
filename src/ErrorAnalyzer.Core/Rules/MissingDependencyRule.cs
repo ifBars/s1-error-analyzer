@@ -28,7 +28,7 @@ internal sealed class MissingDependencyRule : IDetectionRule
                     continue;
                 }
 
-                var modName = headerMatch.Groups["mod"].Value;
+                var modName = document.ResolveModName(headerMatch.Groups["mod"].Value);
                 for (var dependencyIndex = index + 1; dependencyIndex < document.Lines.Count; dependencyIndex++)
                 {
                     var dependencyLine = document.Lines[dependencyIndex];
@@ -63,17 +63,51 @@ internal sealed class MissingDependencyRule : IDetectionRule
 
     private static Diagnosis CreateDiagnosis(LogDocument document, int lineIndex, string? modName, string assemblyName, int lineNumber)
     {
+        var resolvedModName = document.ResolveModName(modName) ?? document.FindNearestModName(lineIndex);
+        if (TryCreateRuntimeMismatchDiagnosis(document, resolvedModName, assemblyName, lineNumber, out var runtimeMismatchDiagnosis))
+        {
+            return runtimeMismatchDiagnosis;
+        }
+
         return new Diagnosis(
             RuleIds.MissingDependency,
             "A required support file is missing",
             $"This mod could not load one of the files it needs: `{assemblyName}`.",
             GetSuggestedAction(assemblyName),
-            modName ?? document.FindNearestModName(lineIndex),
+            resolvedModName,
             $"Missing dependency `{assemblyName}`.",
             lineNumber,
             DiagnosisSeverity.Error,
             DiagnosisConfidence.High,
             GetAdvice(assemblyName));
+    }
+
+    private static bool TryCreateRuntimeMismatchDiagnosis(
+        LogDocument document,
+        string? modName,
+        string assemblyName,
+        int lineNumber,
+        out Diagnosis diagnosis)
+    {
+        if (document.Runtime == RuntimeKind.Il2Cpp &&
+            assemblyName.StartsWith("FishNet.Runtime", StringComparison.OrdinalIgnoreCase))
+        {
+            diagnosis = new Diagnosis(
+                RuleIds.RuntimeMismatchMonoModOnIl2Cpp,
+                "Wrong version of the mod is installed",
+                "This mod is trying to load the Mono FishNet runtime on an Il2Cpp game install.",
+                "Install the Il2Cpp build of this mod. If it has a separate FishNet dependency, use `Il2CppFishNet.Runtime` instead of `FishNet.Runtime`.",
+                modName,
+                $"Missing dependency `{assemblyName}` on an Il2Cpp game install.",
+                lineNumber,
+                DiagnosisSeverity.Error,
+                DiagnosisConfidence.High,
+                DiagnosisAdviceFactory.WrongRuntimeBuild());
+            return true;
+        }
+
+        diagnosis = null!;
+        return false;
     }
 
     private static string GetSuggestedAction(string assemblyName)

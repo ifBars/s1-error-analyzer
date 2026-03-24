@@ -26,6 +26,7 @@ internal sealed class LogDocument
         "UnityEngine.CoreModule",
         "System.Private.CoreLib",
     };
+    private readonly Dictionary<string, string> _preferredModNames;
 
     public LogDocument(string text)
     {
@@ -36,6 +37,7 @@ internal sealed class LogDocument
             .Select((line, index) => new LogLine(index + 1, line))
             .ToArray();
         Runtime = DetectRuntime(Lines);
+        _preferredModNames = BuildPreferredModNames(Lines);
     }
 
     public string Text { get; }
@@ -49,7 +51,7 @@ internal sealed class LogDocument
         var currentLineModName = TryExtractModName(Lines[lineIndex].Text);
         if (!string.IsNullOrWhiteSpace(currentLineModName))
         {
-            return currentLineModName;
+            return ResolveModName(currentLineModName);
         }
 
         foreach (var candidate in EnumerateNearbyLines(lineIndex, searchRadius, allowForwardSearch))
@@ -60,7 +62,7 @@ internal sealed class LogDocument
                 continue;
             }
 
-            return stackOwner;
+            return ResolveModName(stackOwner);
         }
 
         foreach (var candidate in EnumerateNearbyLines(lineIndex, searchRadius, allowForwardSearch))
@@ -68,7 +70,7 @@ internal sealed class LogDocument
             var modName = TryExtractModName(candidate.Text);
             if (!string.IsNullOrWhiteSpace(modName))
             {
-                return modName;
+                return ResolveModName(modName);
             }
         }
 
@@ -80,7 +82,7 @@ internal sealed class LogDocument
                 var assemblyName = NormalizeAssemblyName(match.Groups["assembly"].Value);
                 if (!string.IsNullOrWhiteSpace(assemblyName))
                 {
-                    return assemblyName;
+                    return ResolveModName(assemblyName);
                 }
             }
         }
@@ -98,12 +100,29 @@ internal sealed class LogDocument
                 var assemblyName = NormalizeAssemblyName(match.Groups["assembly"].Value);
                 if (!string.IsNullOrWhiteSpace(assemblyName) && !InfrastructurePrefixes.Contains(assemblyName))
                 {
-                    return assemblyName;
+                    return ResolveModName(assemblyName);
                 }
             }
         }
 
         return null;
+    }
+
+    public string? ResolveModName(string? modName)
+    {
+        var normalized = ModNameNormalizer.Normalize(modName);
+        if (normalized is null)
+        {
+            return null;
+        }
+
+        var key = ModNameNormalizer.GetEquivalenceKey(normalized);
+        if (_preferredModNames.TryGetValue(key, out var preferredModName))
+        {
+            return preferredModName;
+        }
+
+        return normalized;
     }
 
     public IEnumerable<LogLine> EnumerateNearbyLines(int lineIndex, int searchRadius, bool allowForwardSearch = true)
@@ -196,6 +215,43 @@ internal sealed class LogDocument
         }
 
         return normalized;
+    }
+
+    private static Dictionary<string, string> BuildPreferredModNames(IEnumerable<LogLine> lines)
+    {
+        var preferredModNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var line in lines)
+        {
+            RegisterPreferredModName(preferredModNames, TryExtractModName(line.Text));
+            RegisterPreferredModName(preferredModNames, TryExtractStackOwner(line.Text));
+
+            var assemblyMatch = AssemblyRegex.Match(line.Text);
+            if (assemblyMatch.Success)
+            {
+                RegisterPreferredModName(preferredModNames, NormalizeAssemblyName(assemblyMatch.Groups["assembly"].Value));
+            }
+        }
+
+        return preferredModNames;
+    }
+
+    private static void RegisterPreferredModName(Dictionary<string, string> preferredModNames, string? modName)
+    {
+        var normalized = ModNameNormalizer.Normalize(modName);
+        if (normalized is null)
+        {
+            return;
+        }
+
+        var key = ModNameNormalizer.GetEquivalenceKey(normalized);
+        if (preferredModNames.TryGetValue(key, out var existing) &&
+            !ModNameNormalizer.ShouldPreferDisplayName(normalized, existing))
+        {
+            return;
+        }
+
+        preferredModNames[key] = normalized;
     }
 
     private static RuntimeKind DetectRuntime(IEnumerable<LogLine> lines)

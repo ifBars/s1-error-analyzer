@@ -20,7 +20,7 @@ internal sealed class ModInWrongFolderRule : IDetectionRule
             }
 
             var modMatch = MelonNameRegex.Match(line.Text);
-            var modName = modMatch.Success ? modMatch.Groups["mod"].Value : null;
+            var modName = modMatch.Success ? document.ResolveModName(modMatch.Groups["mod"].Value) : null;
 
             yield return new Diagnosis(
                 RuleIds.ModInWrongFolder,

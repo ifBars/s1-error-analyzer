@@ -77,7 +77,7 @@ public sealed class Diagnosis
 
     private static string BuildFingerprint(string ruleId, string? modName, string evidence)
     {
-        var normalizedModName = modName ?? string.Empty;
+        var normalizedModName = ModNameNormalizer.GetEquivalenceKey(modName);
         var payload = $"{ruleId.Length}:{ruleId}|{normalizedModName.Length}:{normalizedModName}|{evidence.Length}:{evidence}";
         using var sha256 = SHA256.Create();
         var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(payload));

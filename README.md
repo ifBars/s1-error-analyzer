@@ -46,6 +46,7 @@ bun run test:workspace
 
 - `ErrorAnalyzer.Core` is prepared to publish as the `ScheduleOne.ErrorAnalyzer.Core` NuGet package.
 - GitHub Actions workflow: `.github/workflows/publish-nuget.yml`
+- The current package version is taken from `<ErrorAnalyzerVersion>` in `Directory.Build.props`.
 - Publish by either:
   - pushing a version bump to `Directory.Build.props` on a `release/**` or `releases/**` branch, or
   - running the workflow manually after updating `<ErrorAnalyzerVersion>` in `Directory.Build.props`

@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <ErrorAnalyzerVersion>0.1.0</ErrorAnalyzerVersion>
+    <ErrorAnalyzerVersion>0.1.1</ErrorAnalyzerVersion>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

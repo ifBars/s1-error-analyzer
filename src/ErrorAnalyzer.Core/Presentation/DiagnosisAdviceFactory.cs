@@ -1,3 +1,5 @@
+using ErrorAnalyzer.Core.Rules;
+
 namespace ErrorAnalyzer.Core.Presentation;
 
 /// <summary>
@@ -31,6 +33,20 @@ public static class DiagnosisAdviceFactory
             "One or more mods are outdated after a game update",
             "Remove these mods for now, or update them if newer versions are available.",
             "These mods are trying to use game code that changed in a recent update.");
+    }
+
+    /// <summary>
+    /// Creates advice for a mod built for the wrong runtime variant.
+    /// </summary>
+    public static DiagnosisAdvice WrongRuntimeBuild()
+    {
+        return new DiagnosisAdvice(
+            RuleIds.RuntimeMismatchMonoModOnIl2Cpp,
+            2,
+            "Most likely fix",
+            "You have the wrong version of a mod installed",
+            "Look for a version of this mod that says Il2Cpp. If you cannot find one, remove the mod.",
+            "The installed copy was built for a different game setup.");
     }
 
     private static string NormalizeText(string value)
