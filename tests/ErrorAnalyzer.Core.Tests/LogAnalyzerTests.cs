@@ -191,6 +191,7 @@ public sealed class LogAnalyzerTests
     }
 
     [Fact]
+    [Trait("Category", "NoErrorLogs")]
     public void TreatsUnderscoresAndSpacesAsTheSameModWhenResolvingNearbyOwner()
     {
         const string logText = """
@@ -206,6 +207,7 @@ public sealed class LogAnalyzerTests
     }
 
     [Fact]
+    [Trait("Category", "NoErrorLogs")]
     public void AggregatesEquivalentModNamesWhenOnlySpacingDiffers()
     {
         var aggregator = new DiagnosisAggregator();

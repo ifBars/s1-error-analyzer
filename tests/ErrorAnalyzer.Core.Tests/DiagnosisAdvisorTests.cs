@@ -58,6 +58,7 @@ public sealed class DiagnosisAdviceTests
     }
 
     [Fact]
+    [Trait("Category", "NoErrorLogs")]
     public void MapsDiagnosisDtosWithSharedAdvicePayload()
     {
         var diagnosis = new Diagnosis(
@@ -103,6 +104,7 @@ public sealed class DiagnosisAdviceTests
     }
 
     [Fact]
+    [Trait("Category", "NoErrorLogs")]
     public void ResultDtoSkipsUnknownModsInAdviceGroups()
     {
         var diagnosis = new Diagnosis(

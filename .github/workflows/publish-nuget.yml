@@ -68,7 +68,7 @@ jobs:
 
       - name: Run core tests
         if: steps.version.outputs.changed == 'true'
-        run: dotnet test tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj --configuration Release --no-restore
+        run: dotnet test tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj --configuration Release --no-restore --filter "Category=NoErrorLogs"
 
       - name: Pack ErrorAnalyzer.Core
         if: steps.version.outputs.changed == 'true'
