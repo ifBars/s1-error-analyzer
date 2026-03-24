@@ -64,7 +64,7 @@ jobs:
 
       - name: Restore dependencies
         if: steps.version.outputs.changed == 'true'
-        run: dotnet restore ErrorAnalyzer.sln
+        run: dotnet restore tests/ErrorAnalyzer.Core.Tests/ErrorAnalyzer.Core.Tests.csproj
 
       - name: Run core tests
         if: steps.version.outputs.changed == 'true'
