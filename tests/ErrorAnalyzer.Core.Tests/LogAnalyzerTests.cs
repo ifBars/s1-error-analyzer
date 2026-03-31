@@ -177,6 +177,34 @@ public sealed class LogAnalyzerTests
     }
 
     [Fact]
+    public void IgnoresHarmonyFrameworkAssemblyScanNoiseInFalsePositiveLog()
+    {
+        var result = Analyze("false_positives.txt");
+        var dto = AnalyzeDto("false_positives.txt");
+
+        Assert.DoesNotContain(result.Diagnoses, x =>
+            x.RuleId == RuleIds.OutdatedTypeReference &&
+            (x.Evidence.Contains("UnityEngine.", StringComparison.Ordinal) ||
+             x.Evidence.Contains("Il2Cppmscorlib", StringComparison.Ordinal) ||
+             x.Evidence.Contains("Il2CppSystem", StringComparison.Ordinal) ||
+             x.Evidence.Contains("Il2Cpp__Generated", StringComparison.Ordinal) ||
+             x.Evidence.Contains("Il2CppOokii.Dialogs", StringComparison.Ordinal)));
+
+        Assert.DoesNotContain(dto.AdviceGroups.SelectMany(group => group.AffectedMods), modName =>
+            string.Equals(modName, "MLVScan", StringComparison.OrdinalIgnoreCase) ||
+            modName.StartsWith("UnityEngine.", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(modName, "Il2Cppmscorlib", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(modName, "Il2CppSystem", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(modName, "Il2Cpp__Generated", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(modName, "Il2CppOokii.Dialogs", StringComparison.OrdinalIgnoreCase));
+
+        Assert.Contains(result.Diagnoses, x =>
+            x.RuleId == RuleIds.MissingMethod &&
+            string.Equals(x.ModName, "OverTheCounter", StringComparison.Ordinal) &&
+            x.Evidence.Contains("NPCEnteredBuilding", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void DoesNotUseGenericClassNamesAsModNames()
     {
         var result = Analyze("new.log");
@@ -249,6 +277,13 @@ public sealed class LogAnalyzerTests
         var logDirectory = FindErrorLogsDirectory();
         var path = Path.Combine(logDirectory, fileName);
         return _analyzer.AnalyzeFile(path);
+    }
+
+    private LogAnalysisResultDto AnalyzeDto(string fileName)
+    {
+        var logDirectory = FindErrorLogsDirectory();
+        var path = Path.Combine(logDirectory, fileName);
+        return _analyzer.AnalyzeFileAsDto(path);
     }
 
     private static string FindErrorLogsDirectory()

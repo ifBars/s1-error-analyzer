@@ -25,6 +25,11 @@ internal sealed class OutdatedTypeReferenceRule : IDetectionRule
                 continue;
             }
 
+            if (document.IsHarmonyAssemblyScanFailure(line.Number - 1))
+            {
+                continue;
+            }
+
             yield return new Diagnosis(
                 RuleIds.OutdatedTypeReference,
                 "This mod is outdated",

@@ -23,8 +23,25 @@ internal sealed class LogDocument
     private static readonly HashSet<string> IgnoredAssemblies = new(StringComparer.OrdinalIgnoreCase)
     {
         "Assembly-CSharp",
+        "mscorlib",
+        "netstandard",
+        "System",
         "UnityEngine.CoreModule",
+        "UnityEngine",
         "System.Private.CoreLib",
+    };
+    private static readonly string[] InfrastructureAssemblyPrefixes =
+    {
+        "HarmonyLib",
+        "Il2Cpp__Generated",
+        "Il2CppInterop",
+        "Il2Cppmscorlib",
+        "Il2CppOokii.",
+        "Il2CppSystem",
+        "MelonLoader",
+        "Mono.",
+        "System.",
+        "UnityEngine.",
     };
     private readonly Dictionary<string, string> _preferredModNames;
 
@@ -149,6 +166,18 @@ internal sealed class LogDocument
     public bool ContainsNearby(int lineIndex, int searchRadius, Func<string, bool> predicate)
         => EnumerateNearbyLines(lineIndex, searchRadius).Any(line => predicate(line.Text));
 
+    public bool IsHarmonyAssemblyScanFailure(int lineIndex)
+    {
+        var assemblyName = ExtractAssemblyName(Lines[lineIndex].Text);
+        if (!IsInfrastructureAssemblyName(assemblyName))
+        {
+            return false;
+        }
+
+        return EnumerateBackwardLines(lineIndex, 16)
+            .Any(line => line.Text.Contains("AccessTools.GetTypesFromAssembly:", StringComparison.Ordinal));
+    }
+
     private IEnumerable<LogLine> EnumerateBackwardLines(int lineIndex, int searchRadius)
     {
         for (var index = lineIndex; index >= 0 && index >= lineIndex - searchRadius; index--)
@@ -209,12 +238,40 @@ internal sealed class LogDocument
     private static string? NormalizeAssemblyName(string value)
     {
         var normalized = value.Trim().Trim('\'', '"');
-        if (string.IsNullOrWhiteSpace(normalized) || IgnoredAssemblies.Contains(normalized))
+        if (string.IsNullOrWhiteSpace(normalized) || IsInfrastructureAssemblyName(normalized))
         {
             return null;
         }
 
         return normalized;
+    }
+
+    private static string? ExtractAssemblyName(string text)
+    {
+        var match = AssemblyRegex.Match(text);
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        var assemblyName = match.Groups["assembly"].Value.Trim().Trim('\'', '"');
+        return string.IsNullOrWhiteSpace(assemblyName) ? null : assemblyName;
+    }
+
+    private static bool IsInfrastructureAssemblyName(string? assemblyName)
+    {
+        if (string.IsNullOrWhiteSpace(assemblyName))
+        {
+            return false;
+        }
+
+        if (IgnoredAssemblies.Contains(assemblyName))
+        {
+            return true;
+        }
+
+        return InfrastructureAssemblyPrefixes.Any(prefix =>
+            assemblyName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
     }
 
     private static Dictionary<string, string> BuildPreferredModNames(IEnumerable<LogLine> lines)
